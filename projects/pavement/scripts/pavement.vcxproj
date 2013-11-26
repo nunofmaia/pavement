@@ -12,10 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\FragmentShader.glsl" />
     <None Include="..\src\shaders\VertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Engine.h" />
+    <ClInclude Include="..\src\Shader.h" />
+    <ClInclude Include="..\src\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{24DB9139-B390-436C-9C9E-2F996E2531EE}</ProjectGuid>

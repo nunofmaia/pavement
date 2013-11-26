@@ -8,10 +8,7 @@
 #include <sstream>
 #include <string>
 
-#include "GL/glew.h"
-#include "GL/freeglut.h"
-
-#include "glm/glm.hpp"
+#include "Engine.h"
 
 #define CAPTION "Tangram"
 
@@ -29,6 +26,8 @@ GLuint VaoId, VboId[2];
 GLuint VertexShaderId, FragmentShaderId, ProgramId;
 GLint UboId, UniformId;
 const GLuint UBO_BP = 0;
+
+ShaderProgram *Shader;
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -92,24 +91,35 @@ const GLchar* FragmentShader =
 
 void createShaderProgram()
 {
-	VertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(VertexShaderId, 1, &VertexShader, 0);
-	glCompileShader(VertexShaderId);
+	//VertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+	//glShaderSource(VertexShaderId, 1, &VertexShader, 0);
+	//glCompileShader(VertexShaderId);
 
-	FragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(FragmentShaderId, 1, &FragmentShader, 0);
-	glCompileShader(FragmentShaderId);
+	//FragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+	//glShaderSource(FragmentShaderId, 1, &FragmentShader, 0);
+	//glCompileShader(FragmentShaderId);
 
-	ProgramId = glCreateProgram();
-	glAttachShader(ProgramId, VertexShaderId);
-	glAttachShader(ProgramId, FragmentShaderId);
+	//ProgramId = glCreateProgram();
+	//glAttachShader(ProgramId, VertexShaderId);
+	//glAttachShader(ProgramId, FragmentShaderId);
 
-	glBindAttribLocation(ProgramId, VERTICES, "in_Position");
-	glBindAttribLocation(ProgramId, COLORS, "in_Color");
-	glLinkProgram(ProgramId);
-	UniformId = glGetUniformLocation(ProgramId, "ModelMatrix");
-	UboId = glGetUniformBlockIndex(ProgramId, "SharedMatrices");
-	glUniformBlockBinding(ProgramId, UboId, UBO_BP);
+	//glBindAttribLocation(ProgramId, VERTICES, "in_Position");
+	//glBindAttribLocation(ProgramId, COLORS, "in_Color");
+	//glLinkProgram(ProgramId);
+	//UniformId = glGetUniformLocation(ProgramId, "ModelMatrix");
+	//UboId = glGetUniformBlockIndex(ProgramId, "SharedMatrices");
+	//glUniformBlockBinding(ProgramId, UboId, UBO_BP);
+
+	Shader = new ShaderProgram();
+
+	Shader->setProgramId();
+	Shader->addShaderFromFile(VERTEX_SHADER_FILE, GL_VERTEX_SHADER);
+	Shader->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
+	Shader->bindAttribLocation(VERTICES, "in_Position");
+	Shader->bindAttribLocation(COLORS, "in_Color");
+	Shader->linkShaderProgram();
+
+	UboId = glGetUniformBlockIndex(Shader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 
 	checkOpenGLError("ERROR: Could not create shaders.");
 }
@@ -123,6 +133,8 @@ void destroyShaderProgram()
 	glDeleteShader(FragmentShaderId);
 	glDeleteShader(VertexShaderId);
 	glDeleteProgram(ProgramId);
+
+	delete(Shader);
 
 	checkOpenGLError("ERROR: Could not destroy shaders.");
 }
@@ -276,12 +288,12 @@ void drawScene()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindVertexArray(VaoId);
-	glUseProgram(ProgramId);
+	Shader->useShaderProgram();
 
-	glUniformMatrix4fv(UniformId, 1, GL_FALSE, I/*ModelMatrix*/);	
+	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	glDrawArrays(GL_TRIANGLES,0,36);
 
-	glUseProgram(0);
+	glUseProgram(0); //TODO: Use ShaderProgram
 	glBindVertexArray(0);
 
 	checkOpenGLError("ERROR: Could not draw scene.");

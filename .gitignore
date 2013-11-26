@@ -1,0 +1,6 @@
+projects/pavement/obj/
+*.sdf
+*.suo
+*.exe
+*.ilk
+*.pdb

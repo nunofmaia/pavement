@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pavement", "..\projects\pavement\scripts\pavement.vcxproj", "{24DB9139-B390-436C-9C9E-2F996E2531EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24DB9139-B390-436C-9C9E-2F996E2531EE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{24DB9139-B390-436C-9C9E-2F996E2531EE}.Debug|Win32.Build.0 = Debug|Win32
+		{24DB9139-B390-436C-9C9E-2F996E2531EE}.Release|Win32.ActiveCfg = Release|Win32
+		{24DB9139-B390-436C-9C9E-2F996E2531EE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

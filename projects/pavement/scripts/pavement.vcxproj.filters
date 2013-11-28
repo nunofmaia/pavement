@@ -17,12 +17,20 @@
       <UniqueIdentifier>{7a38483d-0f5a-46e1-a5ed-4e9b2a368f79}</UniqueIdentifier>
       <Extensions>glsl</Extensions>
     </Filter>
+    <Filter Include="Mesh Files">
+      <UniqueIdentifier>{dfc0d080-d8ab-474b-bbdb-72b0d2f80edd}</UniqueIdentifier>
+      <Extensions>obj;mtl</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,5 +52,19 @@
     <ClInclude Include="..\src\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\src\meshes\cube.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\monkey.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\macaco.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
   </ItemGroup>
 </Project>

@@ -1,10 +1,12 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Engine.h"
-#include "Utils.h"
-
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "GL/glew.h"
+#include "GL/freeglut.h"
 #include <string>
+#include "Utils.h"
 
 class ShaderProgram
 {

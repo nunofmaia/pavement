@@ -25,7 +25,6 @@ public:
 			std::cerr << "Could not read file: "<< filePath << std::endl;
 		}
 	}
-
 };
 
 #endif

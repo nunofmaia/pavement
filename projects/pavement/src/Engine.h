@@ -3,20 +3,22 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 
-#include "Shader.h"
-#include "Utils.h"
+//#include "Shader.h"
+//#include "Utils.h"
+//#include "Mesh.h"
 
 const float qThreshold = (float)1.0e-5;
 const float vThreshold = (float)1.0e-5;
 const float mThreshold = (float)1.0e-5;
 
-//typedef struct {
-//	GLfloat XYZW[4];
-//} Vertex;
+typedef struct {
+	GLfloat XYZW[4];
+} Vertex;
 
 #define VERTICES 0
 #define COLORS 1

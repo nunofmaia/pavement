@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -20,8 +21,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Engine.h" />
+    <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\src\meshes\cube.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="..\src\meshes\macaco.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="..\src\meshes\monkey.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{24DB9139-B390-436C-9C9E-2F996E2531EE}</ProjectGuid>

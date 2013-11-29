@@ -37,7 +37,7 @@ public:
 
 	std::vector< glm::vec4 >*getVertices();
 	Model getModel();
-
+	void reverseElements();
 
 private:
 	std::string meshString;
@@ -46,7 +46,7 @@ private:
 	std::vector< unsigned int > elements;
 	std::vector< int > normal_indexes;
 	bool readMtl;
-	GLuint VaoId, VboId[3];
+	GLuint VaoId, VboId[4];
 };
 
 #endif

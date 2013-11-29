@@ -22,6 +22,8 @@ typedef struct {
 
 #define VERTICES 0
 #define COLORS 1
+#define NORMALS 2
+#define TEXTURES 3
 
 #define PI 3.14159265
 #define DEGREES_TO_RADIANS 0.01745329251994329547

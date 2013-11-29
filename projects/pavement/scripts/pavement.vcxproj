@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\FragmentShader.glsl" />
+    <None Include="..\src\shaders\ReflectionShader.glsl" />
     <None Include="..\src\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -27,9 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\src\meshes\cube.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="..\src\meshes\macaco.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
     <Object Include="..\src\meshes\monkey.obj">

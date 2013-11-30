@@ -49,6 +49,11 @@ Mesh::Mesh(void)
 	readMtl=false;
 }
 
+Mesh::Mesh(int id)
+{
+	readMtl=false;
+	_id = id;
+}
 
 Mesh::~Mesh(void)
 {
@@ -180,10 +185,17 @@ void Mesh::createBufferObjects(){
 
 void Mesh::drawMesh(){
 	glBindVertexArray(VaoId);
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, _id, 0xFF);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VboId[2]);
 	glDrawElements(GL_TRIANGLES, elements.size(), GL_UNSIGNED_INT,(void*)0 );
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glDisable(GL_STENCIL_TEST);
 
 }
 

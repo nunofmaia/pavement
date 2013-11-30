@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 
 #include "Engine.h"
 #include "Shader.h"
@@ -32,6 +33,17 @@ ShaderProgram *GridShader;
 std::vector<Mesh> meshes, copies;
 Model test;
 Grid grid(20);
+
+int ID = 0;
+
+std::map<ShaderProgram*, std::vector<Mesh>*> MeshManager;
+enum SymmetryMode {
+	NONE,
+	ONE
+};
+
+int SymMode = SymmetryMode::NONE;
+
 /////////////////////////////////////////////////////////////////////// ERRORS
 
 bool isOpenGLError() {
@@ -60,19 +72,27 @@ void createMesh(std::string filePath){
 	/** /
 	mesh.loadMeshFile("../src/meshes/knot.obj");
 	/**/
-	Mesh mesh;
-	mesh.loadMeshFile(filePath);
-	mesh.createBufferObjects();
-	meshes.push_back(mesh);
-	/** /
-	mesh.loadMeshFile("../src/meshes/cube_small.obj");
-	/**/
 
-	Mesh copy = mesh;
-	copy.reverseElements();
-	copy.createBufferObjects();
-	copies.push_back(copy);
+	Mesh m(ID++);
+	Mesh n;
+	m.loadMeshFile(filePath);
+	m.createBufferObjects();
+
+	switch (SymMode) {
+	case SymmetryMode::NONE:
+		MeshManager[Shader]->push_back(m);
+		break;
+	case SymmetryMode::ONE:
+		MeshManager[Shader]->push_back(m);
+		n = m;
+		n.reverseElements();
+		n.createBufferObjects();
+		MeshManager[Reflection]->push_back(n);
+		break;
+	}
+
 }
+
 void deleteAllMeshes() {
 	meshes.clear();
 	copies.clear();
@@ -93,6 +113,8 @@ void createShaderProgram()
 	UboId = glGetUniformBlockIndex(Shader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(Shader->getProgramId(), UboId, UBO_BP);
 
+	MeshManager[Shader] = new std::vector<Mesh>();
+
 	Reflection = new ShaderProgram();
 
 	Reflection->setProgramId();
@@ -105,6 +127,8 @@ void createShaderProgram()
 
 	UboId = glGetUniformBlockIndex(Reflection->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(Reflection->getProgramId(), UboId, UBO_BP);
+
+	MeshManager[Reflection] = new std::vector<Mesh>();
 
 	GridShader = new ShaderProgram();
 
@@ -222,20 +246,32 @@ void drawScene()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	
-	Shader->useShaderProgram();
+	//Shader->useShaderProgram();
 
 
 
-	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
-	for (size_t i = 0; i < meshes.size(); i++) {
-		meshes[i].drawMesh();
+	//Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
+	//for (size_t i = 0; i < meshes.size(); i++) {
+	//	meshes[i].drawMesh();
+	//}
+
+	//Reflection->useShaderProgram();
+	//Reflection->setUniform("ModelMatrix", glm::mat4(1.0f));
+	//for (size_t i = 0; i < copies.size(); i++) {
+	//	copies[i].drawMesh();
+	//}
+
+	std::map<ShaderProgram*, std::vector<Mesh>*>::iterator it;
+	for (it = MeshManager.begin(); it != MeshManager.end(); it++) {
+		it->first->useShaderProgram();
+		it->first->setUniform("ModelMatrix", glm::mat4(1.0f));
+		std::vector<Mesh>::iterator ot;
+
+		for (ot = it->second->begin(); ot != it->second->end(); ot++) {
+			ot->drawMesh();
+		}
 	}
 
-	Reflection->useShaderProgram();
-	Reflection->setUniform("ModelMatrix", glm::mat4(1.0f));
-	for (size_t i = 0; i < copies.size(); i++) {
-		copies[i].drawMesh();
-	}
 
 	GridShader->useShaderProgram();
 
@@ -257,7 +293,8 @@ void cleanup()
 void display()
 {
 	++FrameCount;
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClearStencil(0);
 	drawScene();
 	glutSwapBuffers();
 }
@@ -306,6 +343,23 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'd':
 		deleteAllMeshes();
 		break;
+	case '0':
+		SymMode = SymmetryMode::NONE;
+		MeshManager[Reflection]->clear();
+		break;
+	case '1':
+		SymMode = SymmetryMode::ONE;
+
+		std::vector<Mesh>::iterator it;
+		for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+			Mesh c = *it;
+			c.reverseElements();
+			c.createBufferObjects();
+			MeshManager[Reflection]->push_back(c);
+		}
+
+
+		break;
 	}
 }
 
@@ -317,6 +371,30 @@ void keyboardSpecial(int key, int x, int y) {
 	case GLUT_KEY_RIGHT:
 		LAX += 1.0;
 		break;
+	}
+}
+
+int MouseX = 0;
+int MouseY = 0;
+
+void mouse(GLint button, GLint state, GLint x, GLint y) {
+
+	switch (button) {
+	case GLUT_LEFT_BUTTON:
+
+		if (state == GLUT_DOWN) {
+			MouseX = x;
+			MouseY = y;
+
+			GLfloat data;
+			glReadPixels(MouseX, WinY - MouseY - 1, 1, 1, GL_STENCIL_INDEX, GL_FLOAT, &data);
+
+			std::cout << "Stencil data: " << data << std::endl;
+
+		}
+
+		break;
+		
 	}
 }
 
@@ -332,6 +410,7 @@ void setupCallbacks()
 
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboardSpecial);
+	glutMouseFunc(mouse);
 }
 
 void setupOpenGL() {

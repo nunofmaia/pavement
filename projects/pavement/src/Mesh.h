@@ -22,7 +22,10 @@ typedef struct {
 class Mesh
 {
 public:
+	int _id;
+
 	Mesh(void);
+	Mesh(int);
 	~Mesh(void);
 
 	void parseMesh();

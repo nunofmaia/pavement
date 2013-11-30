@@ -11,6 +11,7 @@
 #include "Engine.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Grid.h"
 
 #define CAPTION "Tangram"
 
@@ -27,8 +28,10 @@ const GLuint UBO_BP = 0;
 
 ShaderProgram *Shader; 
 ShaderProgram *Reflection;
+ShaderProgram *GridShader;
 Mesh mesh, copy;
 Model test;
+Grid grid(20);
 /////////////////////////////////////////////////////////////////////// ERRORS
 
 bool isOpenGLError() {
@@ -54,7 +57,13 @@ void checkOpenGLError(std::string error)
 /////////////////////////////////////////////////////////////////////// SHADERs
 
 void createMeshes(){
-	mesh.loadMeshFile("../src/meshes/monkey.obj");
+	/**/
+	mesh.loadMeshFile("../src/meshes/knot.obj");
+	/** /
+	mesh.loadMeshFile("../src/meshes/cube.obj");
+	/** /
+	mesh.loadMeshFile("../src/meshes/cube_small.obj");
+	/**/
 	copy = mesh;
 	copy.reverseElements();
 }
@@ -86,6 +95,19 @@ void createShaderProgram()
 
 	UboId = glGetUniformBlockIndex(Reflection->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(Reflection->getProgramId(), UboId, UBO_BP);
+
+	GridShader = new ShaderProgram();
+
+	GridShader->setProgramId();
+	GridShader->addShaderFromFile("../src/shaders/GridVertexShader.glsl", GL_VERTEX_SHADER);
+	GridShader->addShaderFromFile("../src/shaders/GridFragmentShader.glsl", GL_FRAGMENT_SHADER);
+	GridShader->bindAttribLocation(VERTICES, "in_Position");
+	Reflection->bindAttribLocation(COLORS, "in_Color");
+	Reflection->bindAttribLocation(NORMALS, "in_Normal");
+	GridShader->linkShaderProgram();
+
+	UboId = glGetUniformBlockIndex(GridShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(GridShader->getProgramId(), UboId, UBO_BP);
 	
 	checkOpenGLError("ERROR: Could not create shaders.");
 }
@@ -98,6 +120,7 @@ void destroyShaderProgram()
 
 	delete(Shader);
 	delete(Reflection);
+	delete(GridShader);
 
 	checkOpenGLError("ERROR: Could not destroy shaders.");
 }
@@ -111,7 +134,7 @@ void createBufferObjects(){
 
 	mesh.createBufferObjects();
 	copy.createBufferObjects();
-
+	grid.createBufferObjects();
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(Matrix)*2, 0, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, UBO_BP, VboId[0]);
@@ -187,21 +210,25 @@ void drawScene()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), ViewMatrix1);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 3.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 7.0, 7.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 	
 	Shader->useShaderProgram();
 
-	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
 
+
+	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	mesh.drawMesh();
 
 	Reflection->useShaderProgram();
 	Reflection->setUniform("ModelMatrix", glm::mat4(1.0f));
-
 	copy.drawMesh();
+
+	GridShader->useShaderProgram();
+
+	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
+	grid.drawGrid();
 
 	glUseProgram(0); //TODO: Use ShaderProgram
 	checkOpenGLError("ERROR: Could not draw scene.");

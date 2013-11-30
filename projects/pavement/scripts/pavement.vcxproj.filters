@@ -33,6 +33,9 @@
     <ClCompile Include="..\src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\VertexShader.glsl">
@@ -42,6 +45,12 @@
       <Filter>Shaders Files</Filter>
     </None>
     <None Include="..\src\shaders\ReflectionShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\GridFragmentShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\GridVertexShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
   </ItemGroup>
@@ -58,12 +67,21 @@
     <ClInclude Include="..\src\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\src\meshes\cube.obj">
       <Filter>Mesh Files</Filter>
     </Object>
     <Object Include="..\src\meshes\monkey.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\knot.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\cube_small.obj">
       <Filter>Mesh Files</Filter>
     </Object>
   </ItemGroup>

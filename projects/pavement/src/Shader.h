@@ -21,7 +21,7 @@ public:
 	bool addShaderFromString(const GLchar* shader, GLenum shaderType);
 
 	//Function: check compiler errors from shader compilation. true if ok, false if nok.
-	bool checkShaderCompilation(GLuint id);
+	bool checkShaderCompilation(GLuint id, std::string);
 	
 	//Function: check compiler errors from program linkage. true if ok, false if nok.
 	bool checkProgramLinkage();
@@ -64,6 +64,7 @@ public:
 private:
 	int programId;
 	bool linked;
+	std::string shaderName;
 };
 
 #endif

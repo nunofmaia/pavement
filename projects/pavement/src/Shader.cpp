@@ -13,7 +13,7 @@ ShaderProgram::~ShaderProgram(void)
 
 }
 
-bool ShaderProgram::checkShaderCompilation(GLuint id){
+bool ShaderProgram::checkShaderCompilation(GLuint id, std::string name){
 	GLint status;
 	glGetShaderiv(id, GL_COMPILE_STATUS, &status);
 	if (status == GL_FALSE)
@@ -24,7 +24,7 @@ bool ShaderProgram::checkShaderCompilation(GLuint id){
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetShaderInfoLog(id, infoLogLength, NULL, strInfoLog);
 
-		std::cerr<<"Compile failure in shader "<<id<<": "<<std::endl<<strInfoLog;
+		std::cerr<<name<<" : Compile failure in shader "<<id<<": "<<std::endl<<strInfoLog;
 		delete[] strInfoLog;
 		return false;
 	}
@@ -64,7 +64,7 @@ bool ShaderProgram::addShaderFromFile(std::string filePath, GLenum shaderType){
 	GLuint shaderId = glCreateShader(shaderType);
 	glShaderSource(shaderId,1,&_shader,0);
 	glCompileShader(shaderId);
-	if(checkShaderCompilation(shaderId)){
+	if(checkShaderCompilation(shaderId,filePath)){
 		glAttachShader(programId,shaderId);
 		return true;
 	}
@@ -75,7 +75,7 @@ bool ShaderProgram::addShaderFromString(const GLchar* shader, GLenum shaderType)
 	GLuint shaderId = glCreateShader(shaderType);
 	glShaderSource(shaderId,1,&shader,0);
 	glCompileShader(shaderId);
-	if(checkShaderCompilation(shaderId)){
+	if(checkShaderCompilation(shaderId, "")){
 		glAttachShader(programId,shaderId);
 		return true;
 	}

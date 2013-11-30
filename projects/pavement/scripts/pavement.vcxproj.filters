@@ -78,9 +78,6 @@
     <Object Include="..\src\meshes\monkey.obj">
       <Filter>Mesh Files</Filter>
     </Object>
-    <Object Include="..\src\meshes\knot.obj">
-      <Filter>Mesh Files</Filter>
-    </Object>
     <Object Include="..\src\meshes\cube_small.obj">
       <Filter>Mesh Files</Filter>
     </Object>

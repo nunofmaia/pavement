@@ -57,9 +57,9 @@ void checkOpenGLError(std::string error)
 /////////////////////////////////////////////////////////////////////// SHADERs
 
 void createMeshes(){
-	/**/
-	mesh.loadMeshFile("../src/meshes/knot.obj");
 	/** /
+	mesh.loadMeshFile("../src/meshes/knot.obj");
+	/**/
 	mesh.loadMeshFile("../src/meshes/cube.obj");
 	/** /
 	mesh.loadMeshFile("../src/meshes/cube_small.obj");
@@ -210,7 +210,7 @@ void drawScene()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), ViewMatrix1);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 7.0, 7.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	

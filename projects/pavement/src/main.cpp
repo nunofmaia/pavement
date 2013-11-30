@@ -33,7 +33,6 @@ ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
 ShaderProgram *GridShader;
 std::vector<Mesh> meshes, copies;
-Model test;
 Grid grid(20);
 
 int ID = 0;

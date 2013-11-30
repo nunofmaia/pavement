@@ -29,7 +29,7 @@ const GLuint UBO_BP = 0;
 ShaderProgram *Shader; 
 ShaderProgram *Reflection;
 ShaderProgram *GridShader;
-Mesh mesh, copy;
+std::vector<Mesh> meshes, copies;
 Model test;
 Grid grid(20);
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -56,16 +56,26 @@ void checkOpenGLError(std::string error)
 
 /////////////////////////////////////////////////////////////////////// SHADERs
 
-void createMeshes(){
+void createMesh(std::string filePath){
 	/** /
 	mesh.loadMeshFile("../src/meshes/knot.obj");
 	/**/
-	mesh.loadMeshFile("../src/meshes/cube.obj");
+	Mesh mesh;
+	mesh.loadMeshFile(filePath);
+	mesh.createBufferObjects();
+	meshes.push_back(mesh);
 	/** /
 	mesh.loadMeshFile("../src/meshes/cube_small.obj");
 	/**/
-	copy = mesh;
+
+	Mesh copy = mesh;
 	copy.reverseElements();
+	copy.createBufferObjects();
+	copies.push_back(copy);
+}
+void deleteAllMeshes() {
+	meshes.clear();
+	copies.clear();
 }
 
 void createShaderProgram()
@@ -132,8 +142,6 @@ typedef GLfloat Matrix[16];
 void createBufferObjects(){
 	glGenBuffers(1, VboId);
 
-	mesh.createBufferObjects();
-	copy.createBufferObjects();
 	grid.createBufferObjects();
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(Matrix)*2, 0, GL_STREAM_DRAW);
@@ -219,11 +227,15 @@ void drawScene()
 
 
 	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
-	mesh.drawMesh();
+	for (size_t i = 0; i < meshes.size(); i++) {
+		meshes[i].drawMesh();
+	}
 
 	Reflection->useShaderProgram();
 	Reflection->setUniform("ModelMatrix", glm::mat4(1.0f));
-	copy.drawMesh();
+	for (size_t i = 0; i < copies.size(); i++) {
+		copies[i].drawMesh();
+	}
 
 	GridShader->useShaderProgram();
 
@@ -278,6 +290,21 @@ void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'q':
 		glutDestroyWindow(WindowHandle);
+		break;
+	case 'c':
+		createMesh("../src/meshes/cube.obj");
+		break;
+	case 'v':
+		createMesh("../src/meshes/halfCube.obj");
+		break;
+	case 'b':
+		createMesh("../src/meshes/halfCubePrism.obj");
+		break;
+	case 'n':
+		createMesh("../src/meshes/halfPrism.obj");
+		break;
+	case 'd':
+		deleteAllMeshes();
 		break;
 	}
 }
@@ -354,7 +381,7 @@ void init(int argc, char* argv[])
 	setupGLUT(argc, argv);
 	setupGLEW();
 	setupOpenGL();
-	createMeshes();
+	//createMeshes();
 	createShaderProgram();
 	createBufferObjects();
 	setupCallbacks();

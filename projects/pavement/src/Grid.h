@@ -16,6 +16,7 @@ class Grid
 {
 public:
 	Grid(int);
+	Grid(int, GLfloat);
 	~Grid(void);
 
 	void createBufferObjects();
@@ -24,7 +25,8 @@ public:
 	void drawGrid();
 
 private:
-	int NLines;
+	int _lines;
+	GLfloat _interval;
 	GLuint VaoId, VboId[4];
 	std::vector< glm::vec4 > lines;
 };

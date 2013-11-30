@@ -20,7 +20,9 @@
     <None Include="..\src\shaders\FragmentShader.glsl" />
     <None Include="..\src\shaders\GridFragmentShader.glsl" />
     <None Include="..\src\shaders\GridVertexShader.glsl" />
-    <None Include="..\src\shaders\ReflectionShader.glsl" />
+    <None Include="..\src\shaders\ReflectionXShader.glsl" />
+    <None Include="..\src\shaders\ReflectionOShader.glsl" />
+    <None Include="..\src\shaders\ReflectionZShader.glsl" />
     <None Include="..\src\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -31,13 +33,22 @@
     <ClInclude Include="..\src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\src\meshes\cube.obj">
+    <Object Include="..\src\meshes\halfCube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
-    <Object Include="..\src\meshes\cube_small.obj">
+    <Object Include="..\src\meshes\halfPrism.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
     <Object Include="..\src\meshes\monkey.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="..\src\meshes\cube.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="..\src\meshes\prism.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="..\src\meshes\quarterCube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>

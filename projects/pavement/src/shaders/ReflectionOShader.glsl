@@ -19,11 +19,14 @@ layout(std140) uniform SharedMatrices
 void main(void)
 {
 	Position = in_Position;
+	mat4 MM = ModelMatrix;
+	MM[3][0] = -MM[3][0];
+	MM[3][2] = -MM[3][2];
 
-	Position.x += 0.5;
 	Position.x = -Position.x;
+	Position.z = -Position.z;
 
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * Position;
+	gl_Position = ProjectionMatrix * ViewMatrix * MM * Position;
 	ex_Color = (in_Position * vec4(1.0, 1.0, 1.0, 1.0));
 	
 }

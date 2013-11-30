@@ -8,5 +8,5 @@ uniform vec4 DefaultColor;
 
 void main(void)
 {
-	out_Color = ex_Color;
+	out_Color = ex_Color * 5;
 }

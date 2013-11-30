@@ -2,7 +2,12 @@
 
 Grid::Grid(int lines)
 {
-	NLines=lines;
+	_lines = lines;
+	_interval = 0.25f;
+}
+
+Grid::Grid(int lines, GLfloat interval) : _lines(lines), _interval(interval) {
+
 }
 
 
@@ -11,7 +16,7 @@ Grid::~Grid(void)
 }
 
 void Grid::setNlines(int lines){
-	NLines = lines;
+	_lines = lines;
 }
 
 void Grid::generateGrid(){
@@ -24,18 +29,18 @@ void Grid::generateGrid(){
 	lines.push_back(startHorizontalPoint);
 	lines.push_back(endHorizontalPoint);
 	
-	for(int i = 1; i<NLines; i++){
-		lines.push_back(glm::vec4(startVerticalPoint.x+0.2*i, startVerticalPoint.y, startVerticalPoint.z, startVerticalPoint.w));
-		lines.push_back(glm::vec4(endVerticalPoint.x+0.2*i, endVerticalPoint.y, endVerticalPoint.z, endVerticalPoint.w));
+	for(int i = 1; i < _lines; i++){
+		lines.push_back(glm::vec4(startVerticalPoint.x + _interval * i, startVerticalPoint.y, startVerticalPoint.z, startVerticalPoint.w));
+		lines.push_back(glm::vec4(endVerticalPoint.x+_interval*i, endVerticalPoint.y, endVerticalPoint.z, endVerticalPoint.w));
 
-		lines.push_back(glm::vec4(startVerticalPoint.x-0.2*i, startVerticalPoint.y, startVerticalPoint.z, startVerticalPoint.w));
-		lines.push_back(glm::vec4(endVerticalPoint.x-0.2*i, endVerticalPoint.y, endVerticalPoint.z, endVerticalPoint.w));
+		lines.push_back(glm::vec4(startVerticalPoint.x - _interval * i, startVerticalPoint.y, startVerticalPoint.z, startVerticalPoint.w));
+		lines.push_back(glm::vec4(endVerticalPoint.x - _interval * i, endVerticalPoint.y, endVerticalPoint.z, endVerticalPoint.w));
 
-		lines.push_back(glm::vec4(startHorizontalPoint.x, startHorizontalPoint.y, startHorizontalPoint.z+0.2*i, startHorizontalPoint.w));
-		lines.push_back(glm::vec4(endHorizontalPoint.x, endHorizontalPoint.y, endHorizontalPoint.z+0.2*i, endHorizontalPoint.w));
+		lines.push_back(glm::vec4(startHorizontalPoint.x, startHorizontalPoint.y, startHorizontalPoint.z + _interval * i, startHorizontalPoint.w));
+		lines.push_back(glm::vec4(endHorizontalPoint.x, endHorizontalPoint.y, endHorizontalPoint.z + _interval * i, endHorizontalPoint.w));
 
-		lines.push_back(glm::vec4(startHorizontalPoint.x, startHorizontalPoint.y, startHorizontalPoint.z-0.2*i, startHorizontalPoint.w));
-		lines.push_back(glm::vec4(endHorizontalPoint.x, endHorizontalPoint.y, endHorizontalPoint.z-0.2*i, endHorizontalPoint.w));
+		lines.push_back(glm::vec4(startHorizontalPoint.x, startHorizontalPoint.y, startHorizontalPoint.z - _interval * i, startHorizontalPoint.w));
+		lines.push_back(glm::vec4(endHorizontalPoint.x, endHorizontalPoint.y, endHorizontalPoint.z - _interval * i, endHorizontalPoint.w));
 	}
 	/*for(int i=0; i<(int)lines.size();i++){
 		std::cout<<i+1<<" "<<lines[i].x<<" "<<lines[i].y<<" "<<lines[i].z<<std::endl;

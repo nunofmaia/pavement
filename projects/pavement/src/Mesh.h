@@ -28,7 +28,7 @@ public:
 	Mesh(int);
 	~Mesh(void);
 
-	void parseMesh();
+	void parse();
 	void loadMeshFile(std::string filePath);
 	void printMesh();
 	void printVertices();
@@ -36,7 +36,7 @@ public:
 	void printElements();
 	void printNormalIndexes();
 	void createBufferObjects();
-	void drawMesh();
+	void draw();
 
 	std::vector< glm::vec4 >*getVertices();
 	Model getModel();

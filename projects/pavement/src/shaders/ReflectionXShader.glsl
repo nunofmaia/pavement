@@ -3,6 +3,7 @@
 in vec4 in_Position;
 in vec4 in_Color;
 in vec4 in_Normal;
+
 out vec4 ex_Color;
 
 uniform mat4 ModelMatrix;
@@ -16,10 +17,14 @@ layout(std140) uniform SharedMatrices
 };
 
 void main(void)
-{	
+{
 	Position = in_Position;
+	mat4 MM = ModelMatrix;
+	MM[3][0] = -MM[3][0];
 
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * Position;
+	Position.x = -Position.x;
+
+	gl_Position = ProjectionMatrix * ViewMatrix * MM * Position;
 	ex_Color = (in_Position * vec4(1.0, 1.0, 1.0, 1.0));
 	
 }

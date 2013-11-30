@@ -59,7 +59,7 @@ Mesh::~Mesh(void)
 {
 }
 
-void Mesh::parseMesh(){
+void Mesh::parse(){
 	std::string data;
 	std::stringstream meshstream(meshString);
 	while(getline(meshstream,data)){
@@ -100,7 +100,7 @@ void Mesh::parseMesh(){
 
 void Mesh::loadMeshFile(std::string filePath){
 	meshString = Utils::readFile(filePath);
-	parseMesh();
+	parse();
 	std::cerr<<"Mesh loaded: "<<filePath<<" Vertices: "<<vertices.size()<<" Normals: "<<normals.size()<<" Elements: "<<elements.size()<<std::endl;
 }
 
@@ -183,7 +183,7 @@ void Mesh::createBufferObjects(){
 	//checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
-void Mesh::drawMesh(){
+void Mesh::draw(){
 	glBindVertexArray(VaoId);
 
 	glEnable(GL_STENCIL_TEST);

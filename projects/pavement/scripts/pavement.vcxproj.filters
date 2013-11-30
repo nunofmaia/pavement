@@ -44,13 +44,19 @@
     <None Include="..\src\shaders\FragmentShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
-    <None Include="..\src\shaders\ReflectionShader.glsl">
-      <Filter>Shaders Files</Filter>
-    </None>
     <None Include="..\src\shaders\GridFragmentShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
     <None Include="..\src\shaders\GridVertexShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\ReflectionXShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\ReflectionZShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\ReflectionOShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
   </ItemGroup>
@@ -72,13 +78,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\src\meshes\cube.obj">
-      <Filter>Mesh Files</Filter>
-    </Object>
     <Object Include="..\src\meshes\monkey.obj">
       <Filter>Mesh Files</Filter>
     </Object>
-    <Object Include="..\src\meshes\cube_small.obj">
+    <Object Include="..\src\meshes\cube.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\halfPrism.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\prism.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\halfCube.obj">
+      <Filter>Mesh Files</Filter>
+    </Object>
+    <Object Include="..\src\meshes\quarterCube.obj">
       <Filter>Mesh Files</Filter>
     </Object>
   </ItemGroup>

@@ -28,7 +28,9 @@ GLint UboId, UniformId;
 const GLuint UBO_BP = 0;
 
 ShaderProgram *Shader; 
-ShaderProgram *Reflection;
+ShaderProgram *ReflectionX;
+ShaderProgram *ReflectionZ;
+ShaderProgram *ReflectionO;
 ShaderProgram *GridShader;
 std::vector<Mesh> meshes, copies;
 Model test;
@@ -39,7 +41,10 @@ int ID = 0;
 std::map<ShaderProgram*, std::vector<Mesh>*> MeshManager;
 enum SymmetryMode {
 	NONE,
-	ONE
+	XAXIS,
+	ZAXIS,
+	XZAXIS,
+	O
 };
 
 int SymMode = SymmetryMode::NONE;
@@ -82,20 +87,44 @@ void createMesh(std::string filePath){
 	case SymmetryMode::NONE:
 		MeshManager[Shader]->push_back(m);
 		break;
-	case SymmetryMode::ONE:
+	case SymmetryMode::XAXIS:
 		MeshManager[Shader]->push_back(m);
 		n = m;
 		n.reverseElements();
 		n.createBufferObjects();
-		MeshManager[Reflection]->push_back(n);
+		MeshManager[ReflectionX]->push_back(n);
+		break;
+	case SymmetryMode::ZAXIS:
+		MeshManager[Shader]->push_back(m);
+		n = m;
+		n.reverseElements();
+		n.createBufferObjects();
+		MeshManager[ReflectionZ]->push_back(n);
+		break;
+	case SymmetryMode::XZAXIS:
+		MeshManager[Shader]->push_back(m);
+		n = m;
+		n.reverseElements();
+		n.createBufferObjects();
+		MeshManager[ReflectionZ]->push_back(n);
+		MeshManager[ReflectionX]->push_back(n);
+		MeshManager[ReflectionO]->push_back(m);
+		break;
+	case SymmetryMode::O:
+		MeshManager[Shader]->push_back(m);
+		n = m;
+		n.createBufferObjects();
+		MeshManager[ReflectionO]->push_back(n);
 		break;
 	}
 
 }
 
 void deleteAllMeshes() {
-	meshes.clear();
-	copies.clear();
+	MeshManager[Shader]->clear();
+	MeshManager[ReflectionX]->clear();
+	MeshManager[ReflectionZ]->clear();
+	MeshManager[ReflectionO]->clear();
 }
 
 void createShaderProgram()
@@ -115,20 +144,50 @@ void createShaderProgram()
 
 	MeshManager[Shader] = new std::vector<Mesh>();
 
-	Reflection = new ShaderProgram();
+	ReflectionX = new ShaderProgram();
 
-	Reflection->setProgramId();
-	Reflection->addShaderFromFile("../src/shaders/ReflectionShader.glsl", GL_VERTEX_SHADER);
-	Reflection->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
-	Reflection->bindAttribLocation(VERTICES, "in_Position");
-	Reflection->bindAttribLocation(COLORS, "in_Color");
-	Reflection->bindAttribLocation(NORMALS, "in_Normal");
-	Reflection->linkShaderProgram();
+	ReflectionX->setProgramId();
+	ReflectionX->addShaderFromFile("../src/shaders/ReflectionXShader.glsl", GL_VERTEX_SHADER);
+	ReflectionX->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
+	ReflectionX->bindAttribLocation(VERTICES, "in_Position");
+	ReflectionX->bindAttribLocation(COLORS, "in_Color");
+	ReflectionX->bindAttribLocation(NORMALS, "in_Normal");
+	ReflectionX->linkShaderProgram();
 
-	UboId = glGetUniformBlockIndex(Reflection->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
-	glUniformBlockBinding(Reflection->getProgramId(), UboId, UBO_BP);
+	UboId = glGetUniformBlockIndex(ReflectionX->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(ReflectionX->getProgramId(), UboId, UBO_BP);
 
-	MeshManager[Reflection] = new std::vector<Mesh>();
+	MeshManager[ReflectionX] = new std::vector<Mesh>();
+
+	ReflectionZ = new ShaderProgram();
+
+	ReflectionZ->setProgramId();
+	ReflectionZ->addShaderFromFile("../src/shaders/ReflectionZShader.glsl", GL_VERTEX_SHADER);
+	ReflectionZ->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
+	ReflectionZ->bindAttribLocation(VERTICES, "in_Position");
+	ReflectionZ->bindAttribLocation(COLORS, "in_Color");
+	ReflectionZ->bindAttribLocation(NORMALS, "in_Normal");
+	ReflectionZ->linkShaderProgram();
+
+	UboId = glGetUniformBlockIndex(ReflectionZ->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(ReflectionZ->getProgramId(), UboId, UBO_BP);
+
+	MeshManager[ReflectionZ] = new std::vector<Mesh>();
+
+	ReflectionO = new ShaderProgram();
+
+	ReflectionO->setProgramId();
+	ReflectionO->addShaderFromFile("../src/shaders/ReflectionOShader.glsl", GL_VERTEX_SHADER);
+	ReflectionO->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
+	ReflectionO->bindAttribLocation(VERTICES, "in_Position");
+	ReflectionO->bindAttribLocation(COLORS, "in_Color");
+	ReflectionO->bindAttribLocation(NORMALS, "in_Normal");
+	ReflectionO->linkShaderProgram();
+
+	UboId = glGetUniformBlockIndex(ReflectionO->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(ReflectionO->getProgramId(), UboId, UBO_BP);
+
+	MeshManager[ReflectionO] = new std::vector<Mesh>();
 
 	GridShader = new ShaderProgram();
 
@@ -136,8 +195,8 @@ void createShaderProgram()
 	GridShader->addShaderFromFile("../src/shaders/GridVertexShader.glsl", GL_VERTEX_SHADER);
 	GridShader->addShaderFromFile("../src/shaders/GridFragmentShader.glsl", GL_FRAGMENT_SHADER);
 	GridShader->bindAttribLocation(VERTICES, "in_Position");
-	Reflection->bindAttribLocation(COLORS, "in_Color");
-	Reflection->bindAttribLocation(NORMALS, "in_Normal");
+	ReflectionX->bindAttribLocation(COLORS, "in_Color");
+	ReflectionX->bindAttribLocation(NORMALS, "in_Normal");
 	GridShader->linkShaderProgram();
 
 	UboId = glGetUniformBlockIndex(GridShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
@@ -153,7 +212,7 @@ void destroyShaderProgram()
 	//TODO: Detach shaders
 
 	delete(Shader);
-	delete(Reflection);
+	delete(ReflectionX);
 	delete(GridShader);
 
 	checkOpenGLError("ERROR: Could not destroy shaders.");
@@ -241,41 +300,26 @@ GLfloat LAX = 0.0;
 void drawScene()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
-	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), ViewMatrix1);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 2.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	
-	//Shader->useShaderProgram();
 
-
-
-	//Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
-	//for (size_t i = 0; i < meshes.size(); i++) {
-	//	meshes[i].drawMesh();
-	//}
-
-	//Reflection->useShaderProgram();
-	//Reflection->setUniform("ModelMatrix", glm::mat4(1.0f));
-	//for (size_t i = 0; i < copies.size(); i++) {
-	//	copies[i].drawMesh();
-	//}
 
 	std::map<ShaderProgram*, std::vector<Mesh>*>::iterator it;
 	for (it = MeshManager.begin(); it != MeshManager.end(); it++) {
 		it->first->useShaderProgram();
-		it->first->setUniform("ModelMatrix", glm::mat4(1.0f));
+		it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), glm::vec3(0.125, 0.125, 0.125)));
 		std::vector<Mesh>::iterator ot;
 
 		for (ot = it->second->begin(); ot != it->second->end(); ot++) {
-			ot->drawMesh();
+			ot->draw();
 		}
 	}
 
 
 	GridShader->useShaderProgram();
 
-	Shader->setUniform("ModelMatrix", glm::mat4(1.0f));
+	GridShader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	grid.drawGrid();
 
 	glUseProgram(0); //TODO: Use ShaderProgram
@@ -324,6 +368,8 @@ void timer(int value)
 
 void keyboard(unsigned char key, int x, int y) {
 
+	std::vector<Mesh>::iterator it;
+
 	switch (key) {
 	case 'q':
 		glutDestroyWindow(WindowHandle);
@@ -335,30 +381,114 @@ void keyboard(unsigned char key, int x, int y) {
 		createMesh("../src/meshes/halfCube.obj");
 		break;
 	case 'b':
-		createMesh("../src/meshes/halfCubePrism.obj");
+		createMesh("../src/meshes/prism.obj");
 		break;
 	case 'n':
 		createMesh("../src/meshes/halfPrism.obj");
+		break;
+	case 'm':
+		createMesh("../src/meshes/quarterCube.obj");
 		break;
 	case 'd':
 		deleteAllMeshes();
 		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
-		MeshManager[Reflection]->clear();
+		MeshManager[ReflectionX]->clear();
+		MeshManager[ReflectionZ]->clear();
+		MeshManager[ReflectionO]->clear();
 		break;
 	case '1':
-		SymMode = SymmetryMode::ONE;
+		SymMode = SymmetryMode::XAXIS;
+		MeshManager[ReflectionZ]->clear();
+		MeshManager[ReflectionO]->clear();
 
-		std::vector<Mesh>::iterator it;
 		for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
 			Mesh c = *it;
 			c.reverseElements();
 			c.createBufferObjects();
-			MeshManager[Reflection]->push_back(c);
+			MeshManager[ReflectionX]->push_back(c);
 		}
 
+		break;
+	case '2':
+		SymMode = SymmetryMode::ZAXIS;
+		MeshManager[ReflectionX]->clear();
+		MeshManager[ReflectionO]->clear();
 
+		for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+			Mesh c = *it;
+			c.reverseElements();
+			c.createBufferObjects();
+			MeshManager[ReflectionZ]->push_back(c);
+		}
+		break;
+	case '3':
+		SymMode = SymmetryMode::O;
+		MeshManager[ReflectionX]->clear();
+		MeshManager[ReflectionZ]->clear();
+
+		for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+			Mesh c = *it;
+			c.createBufferObjects();
+			MeshManager[ReflectionO]->push_back(c);
+		}
+		break;
+
+	case '4':
+		if (SymMode == SymmetryMode::XAXIS) {
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.reverseElements();
+				c.createBufferObjects();
+				MeshManager[ReflectionZ]->push_back(c);
+			}
+
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.createBufferObjects();
+				MeshManager[ReflectionO]->push_back(c);
+			}
+
+		} else if (SymMode == SymmetryMode::ZAXIS) {
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.reverseElements();
+				c.createBufferObjects();
+				MeshManager[ReflectionX]->push_back(c);
+			}
+
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.createBufferObjects();
+				MeshManager[ReflectionO]->push_back(c);
+			}
+
+		} else if (SymMode == SymmetryMode::O) {
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.reverseElements();
+				c.createBufferObjects();
+				MeshManager[ReflectionX]->push_back(c);
+				MeshManager[ReflectionZ]->push_back(c);
+			}
+		} else {
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.reverseElements();
+				c.createBufferObjects();
+				MeshManager[ReflectionX]->push_back(c);
+				MeshManager[ReflectionZ]->push_back(c);
+			}
+
+			for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+				Mesh c = *it;
+				c.createBufferObjects();
+				MeshManager[ReflectionO]->push_back(c);
+			}
+		}
+
+		SymMode = SymmetryMode::XZAXIS;
 		break;
 	}
 }

@@ -16,9 +16,15 @@ class Mesh
 {
 public:
 	int _id;
+	glm::vec3 _position;
+	bool _isCopy;
+	bool _canDraw;
+	std::vector< glm::vec4 > vertices;
+	std::vector< glm::vec4 > normals;
 
 	Mesh(void);
 	Mesh(int);
+	Mesh(Mesh*);
 	~Mesh(void);
 
 	void parse();
@@ -29,16 +35,20 @@ public:
 
 	std::vector< glm::vec4 >*getVertices();
 	void reverseElements();
+	void addCopy(Mesh*);
+	void updateCopies();
+	void setPosition(glm::vec3);
 
 private:
+	std::vector<Mesh*> _copies;
 	std::string meshString;
-	std::vector< glm::vec4 > vertices;
-	std::vector< glm::vec4 > normals;
+
 	std::vector< glm::vec4 > vertexIndices;
 	std::vector< glm::vec4 > normalIndices;
 	bool readMtl;
 	GLuint VaoId, VboId[4];
 };
+
 
 #endif
 

@@ -9,7 +9,18 @@ Mesh::Mesh(int id)
 {
 	readMtl=false;
 	_id = id;
+	_isCopy = false;
+	_canDraw = true;
 }
+
+Mesh::Mesh(Mesh* m) {
+	_id = m->_id;
+	_position = m->_position;
+	_isCopy = true;
+	vertices = m->vertices;
+	normals = m->normals;
+}
+
 
 Mesh::~Mesh(void)
 {
@@ -94,17 +105,22 @@ void Mesh::createBufferObjects(){
 }
 
 void Mesh::draw(){
-	glBindVertexArray(VaoId);
-	
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilFunc(GL_ALWAYS, _id, 0xFF);
 
-	
-	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-	glBindVertexArray(0);
 
-	glDisable(GL_STENCIL_TEST);
+	if(_canDraw) {
+
+		glBindVertexArray(VaoId);
+
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, _id, 0xFF);
+
+
+		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		glBindVertexArray(0);
+
+		glDisable(GL_STENCIL_TEST);
+	}
 
 }
 
@@ -112,3 +128,23 @@ void Mesh::reverseElements() {
 	std::reverse(vertices.begin(), vertices.end());
 	std::reverse(normals.begin(), normals.end());
 }
+
+void Mesh::addCopy(Mesh* copy) {
+	_copies.push_back(copy);
+}
+
+void Mesh::updateCopies() {
+	std::vector<Mesh*>::iterator it;
+	for (it = _copies.begin(); it != _copies.end(); it++) {
+		(*it)->setPosition(_position);
+	}
+
+}
+
+void Mesh::setPosition(glm::vec3 pos) {
+	_position = pos;
+	if (!_isCopy) {
+		updateCopies();
+	}
+}
+

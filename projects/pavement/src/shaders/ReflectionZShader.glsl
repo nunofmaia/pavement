@@ -6,9 +6,14 @@ in vec4 in_Normal;
 
 out vec4 ex_Color;
 
+out vec3 v;
+out vec3 n;
+
 uniform mat4 ModelMatrix;
+vec4 LightPos = vec4(0.0,0.0,10.0,1.0);
 
 vec4 Position;
+vec4 Normal;
 
 layout(std140) uniform SharedMatrices
 {
@@ -19,12 +24,18 @@ layout(std140) uniform SharedMatrices
 void main(void)
 {
 	Position = in_Position;
+	Position.z = -Position.z;
+	Normal = in_Normal;
+	Normal.z = -Normal.z;
 	mat4 MM = ModelMatrix;
 	MM[3][2] = -MM[3][2];
 
-	Position.z = -Position.z;
+	mat4 MV = ViewMatrix * MM;
+	mat4 NM = transpose(inverse(MV));
+
+	v = vec3(MV * in_Position);
+	n = vec3(normalize(NM * Normal));
 
 	gl_Position = ProjectionMatrix * ViewMatrix * MM * Position;
-	ex_Color = (in_Position * vec4(1.0, 1.0, 1.0, 1.0));
 	
 }

@@ -362,6 +362,7 @@ void drawScene()
 		for (ot = it->second->begin(); ot != it->second->end(); ot++) {
 			it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), (*ot)->_position));
 			it->first->setUniform("DefaultColor", (*ot)->_color);
+			it->first->setUniform("Angle", (*ot)->_angle);
 			(*ot)->draw();
 		}
 	}
@@ -452,6 +453,12 @@ void keyboard(unsigned char key, int x, int y) {
 			SelectedMesh->setColor(glm::vec4(1.0, 0.98, 0.92, 1.0));
 		}
 		break;
+	case 'r':
+		if(SelectedMesh != NULL){
+			GLfloat newAngle = SelectedMesh->_angle + 90.0f;
+			SelectedMesh->setAngle(newAngle);
+		}
+		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
 		hideSolids(ReflectionX);
@@ -496,7 +503,7 @@ void keyboardSpecial(int key, int x, int y) {
 	case GLUT_KEY_LEFT:
 		if (SelectedMesh != NULL) {
 			glm::vec3 newPosition = SelectedMesh->_position;
-			newPosition.x -= 0.25;
+			newPosition.x -= 0.125;
 			SelectedMesh->setPosition(newPosition);
 		}
 
@@ -504,14 +511,14 @@ void keyboardSpecial(int key, int x, int y) {
 	case GLUT_KEY_RIGHT:
 		if (SelectedMesh != NULL) {
 			glm::vec3 newPosition = SelectedMesh->_position;
-			newPosition.x += 0.25;
+			newPosition.x += 0.125;
 			SelectedMesh->setPosition(newPosition);
 		}
 		break;
 	case GLUT_KEY_UP:
 		if (SelectedMesh != NULL) {
 			glm::vec3 newPosition = SelectedMesh->_position;
-			newPosition.z -= 0.25;
+			newPosition.z -= 0.125;
 			SelectedMesh->setPosition(newPosition);
 		}
 
@@ -519,7 +526,7 @@ void keyboardSpecial(int key, int x, int y) {
 	case GLUT_KEY_DOWN:
 		if (SelectedMesh != NULL) {
 			glm::vec3 newPosition = SelectedMesh->_position;
-			newPosition.z += 0.25;
+			newPosition.z += 0.125;
 			SelectedMesh->setPosition(newPosition);
 		}
 		break;

@@ -9,6 +9,7 @@ out vec3 n;
 
 uniform mat4 ModelMatrix;
 uniform vec4 DefaultColor;
+uniform float Angle;
 
 vec4 Position;
 
@@ -18,11 +19,21 @@ layout(std140) uniform SharedMatrices
 	mat4 ProjectionMatrix;
 };
 
+mat4 rotationMatrix(float angle)
+{    
+	angle = angle * 3.14 / 180;
+    return mat4( cos( angle ),  0.0, sin( angle ), 0.0,
+			             0.0,           1.0, 0.0, 0.0,
+			     -sin( angle ),  0.0 ,cos( angle ), 0.0,
+				     0.0,           0.0, 0.0, 1.0 );
+}
+
 void main(void)
 {	
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * in_Position;
+	mat4 RM = rotationMatrix(Angle);
+	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * RM * in_Position;
 
-	mat4 MV = ViewMatrix * ModelMatrix;
+	mat4 MV = ViewMatrix * ModelMatrix * RM;
 	mat4 NM = transpose(inverse(MV));
 
 	v = vec3(MV * in_Position);

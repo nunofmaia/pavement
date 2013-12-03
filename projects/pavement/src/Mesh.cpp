@@ -11,7 +11,8 @@ Mesh::Mesh(int id)
 	_id = id;
 	_isCopy = false;
 	_canDraw = true;
-	_color = glm::vec4(0.8, 0.2, 0.4, 1.0);
+	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
+	_angle = 90.0f;
 }
 
 Mesh::Mesh(Mesh* m) {
@@ -21,6 +22,7 @@ Mesh::Mesh(Mesh* m) {
 	vertices = m->vertices;
 	normals = m->normals;
 	_color = m->_color;
+	_angle = m->_angle;
 }
 
 
@@ -158,3 +160,10 @@ void Mesh::setPosition(glm::vec3 pos) {
 	}
 }
 
+void Mesh::setAngle(GLfloat angle) {
+	_angle = angle;
+	std::vector<Mesh*>::iterator it;
+	for (it = _copies.begin(); it != _copies.end(); it++) {
+		(*it)->_angle = angle;
+	}
+}

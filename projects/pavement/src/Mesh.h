@@ -17,6 +17,7 @@ class Mesh
 public:
 	int _id;
 	glm::vec3 _position;
+	GLfloat _angle;
 	bool _isCopy;
 	bool _canDraw;
 	std::vector< glm::vec4 > vertices;
@@ -29,6 +30,7 @@ public:
 	~Mesh(void);
 
 	void setColor(glm::vec4 color);
+	void setAngle(GLfloat);
 
 	void parse();
 	void loadMeshFile(std::string filePath);

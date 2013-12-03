@@ -361,6 +361,7 @@ void drawScene()
 		std::vector<Mesh*>::iterator ot;
 		for (ot = it->second->begin(); ot != it->second->end(); ot++) {
 			it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), (*ot)->_position));
+			it->first->setUniform("DefaultColor", (*ot)->_color);
 			(*ot)->draw();
 		}
 	}
@@ -440,6 +441,16 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'd':
 		deleteAllMeshes();
+		break;
+	case 'p':
+		if(SelectedMesh != NULL){
+			SelectedMesh->setColor(glm::vec4(0.164, 0.168, 0.22, 1.0));
+		}
+		break;
+	case 'o':
+		if(SelectedMesh != NULL){
+			SelectedMesh->setColor(glm::vec4(1.0, 0.98, 0.92, 1.0));
+		}
 		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
@@ -576,7 +587,7 @@ void setupCallbacks()
 
 void setupOpenGL() {
 	std::cerr << "CONTEXT: OpenGL v" << glGetString(GL_VERSION) << std::endl;
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_TRUE);

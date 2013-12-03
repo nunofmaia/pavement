@@ -8,6 +8,7 @@ out vec3 v;
 out vec3 n;
 
 uniform mat4 ModelMatrix;
+uniform vec4 DefaultColor;
 
 vec4 Position;
 
@@ -26,5 +27,6 @@ void main(void)
 
 	v = vec3(MV * in_Position);
 	n = vec3(NM * in_Normal);
+	ex_Color = DefaultColor;
 	
 }

@@ -121,7 +121,7 @@ void ShaderProgram::setUniform(const char *name, const glm::vec3 & v){
 void ShaderProgram::setUniform(const char *name, const glm::vec4 & v){
 	GLint uniformLocation = glGetUniformLocation(programId,name);
 	if(uniformLocation!=-1)
-		glUniform3fv(uniformLocation,1, glm::value_ptr(v));
+		glUniform4fv(uniformLocation,1, glm::value_ptr(v));
 	else
 		std::cerr<<"Uniform: "<<name<<" not found."<<std::endl;
 }

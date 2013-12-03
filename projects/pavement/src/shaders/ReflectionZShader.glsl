@@ -10,7 +10,7 @@ out vec3 v;
 out vec3 n;
 
 uniform mat4 ModelMatrix;
-vec4 LightPos = vec4(0.0,0.0,10.0,1.0);
+uniform vec4 DefaultColor;
 
 vec4 Position;
 vec4 Normal;
@@ -37,5 +37,6 @@ void main(void)
 	n = vec3(normalize(NM * Normal));
 
 	gl_Position = ProjectionMatrix * ViewMatrix * MM * Position;
+	ex_Color = DefaultColor;
 	
 }

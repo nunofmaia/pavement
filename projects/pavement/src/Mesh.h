@@ -21,11 +21,14 @@ public:
 	bool _canDraw;
 	std::vector< glm::vec4 > vertices;
 	std::vector< glm::vec4 > normals;
+	glm::vec4 _color;
 
 	Mesh(void);
 	Mesh(int);
 	Mesh(Mesh*);
 	~Mesh(void);
+
+	void setColor(glm::vec4 color);
 
 	void parse();
 	void loadMeshFile(std::string filePath);

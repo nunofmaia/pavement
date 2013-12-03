@@ -11,7 +11,7 @@ void main(void) {
 	vec3 normal = normalize(n);
 	vec3 eye = vec3(0.0, 5.0, 5.0);
 	vec3 lightSource = vec3(0.0,5.0,0.0);
-	vec4 diffuseLight = vec4(0.8, 0.2, 0.4,1.0);
+	vec4 diffuseLight = ex_Color;
 	vec4 ambientLight = vec4(0.1,0.1,0.1,1.0);
 	vec4 specularLight = vec4(0.5,0.5,0.5,1.0);
 	float shininess = 10.0; 

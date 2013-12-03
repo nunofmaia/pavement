@@ -11,6 +11,7 @@ Mesh::Mesh(int id)
 	_id = id;
 	_isCopy = false;
 	_canDraw = true;
+	_color = glm::vec4(0.8, 0.2, 0.4, 1.0);
 }
 
 Mesh::Mesh(Mesh* m) {
@@ -19,6 +20,7 @@ Mesh::Mesh(Mesh* m) {
 	_isCopy = true;
 	vertices = m->vertices;
 	normals = m->normals;
+	_color = m->_color;
 }
 
 
@@ -63,6 +65,14 @@ void Mesh::parse(){
 			readMtl=true;
 	}
 
+}
+
+void Mesh::setColor(glm::vec4 color){
+	_color = color;
+	std::vector<Mesh*>::iterator it;
+	for (it = _copies.begin(); it != _copies.end(); it++) {
+		(*it)->_color = color;
+	}
 }
 
 void Mesh::loadMeshFile(std::string filePath){

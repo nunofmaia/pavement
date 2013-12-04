@@ -13,15 +13,17 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "Grid.h"
+#include "Camera.h"
 
 #define CAPTION "Tangram"
 
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 
-int WinX = 640, WinY = 480;
+int WinX = 640, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
+bool canDrag=false;
 
 GLuint VaoId, VboId[4];
 GLint UboId, UniformId;
@@ -32,9 +34,12 @@ ShaderProgram *ReflectionX;
 ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
 ShaderProgram *GridShader;
+
+Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 Grid grid(20);
 
 int ID = 1;
+int lastMx = 0, lastMy = 0;
 Mesh* SelectedMesh;
 
 std::map<ShaderProgram*, std::vector<Mesh*>*> MeshManager;
@@ -125,14 +130,12 @@ void createMesh(std::string filePath){
 		o->_canDraw = false;
 		break;
 	case SymmetryMode::XZAXIS:
-		
 		break;
 	case SymmetryMode::O:
 		x->_canDraw = false;
 		z->_canDraw = false;
 		break;
 	}
-
 }
 
 Mesh* findMesh(int id) {
@@ -170,10 +173,10 @@ void showSolids(ShaderProgram* p) {
 }
 
 void deleteAllMeshes() {
-	//MeshManager[Shader]->clear();
-	//MeshManager[ReflectionX]->clear();
-	//MeshManager[ReflectionZ]->clear();
-	//MeshManager[ReflectionO]->clear();
+	MeshManager[Shader]->clear();
+	MeshManager[ReflectionX]->clear();
+	MeshManager[ReflectionZ]->clear();
+	MeshManager[ReflectionO]->clear();
 }
 
 void createShaderProgram()
@@ -276,7 +279,7 @@ void createBufferObjects(){
 
 	grid.createBufferObjects();
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(Matrix)*2, 0, GL_STREAM_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, 0, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, UBO_BP, VboId[0]);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -344,13 +347,13 @@ const Matrix ProjectionMatrix2 = {
 	0.00f,  0.00f, -2.22f,  0.00f
 }; // Column Major
 
-GLfloat LAX = 0.0;
-
 void drawScene()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	myCamera->lookAt();
+	myCamera->viewMode();
+	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
@@ -366,7 +369,6 @@ void drawScene()
 			(*ot)->draw();
 		}
 	}
-
 
 	GridShader->useShaderProgram();
 
@@ -459,6 +461,10 @@ void keyboard(unsigned char key, int x, int y) {
 			SelectedMesh->setAngle(newAngle);
 		}
 		break;
+	case 'l':
+		std::cout<<"restart"<<std::endl;
+		myCamera->restartCamera();
+		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
 		hideSolids(ReflectionX);
@@ -544,7 +550,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 		if (state == GLUT_DOWN) {
 			MouseX = x;
 			MouseY = y;
-
+			lastMx=x;
+			lastMy=y;
 			GLfloat data;
 			glReadPixels(MouseX, WinY - MouseY - 1, 1, 1, GL_STENCIL_INDEX, GL_FLOAT, &data);
 
@@ -557,7 +564,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				}
 
 				SelectedMesh = NULL;
-
+				canDrag=true;
 			} else {
 				if (SelectedMesh != NULL) {
 					glm::vec3 currentPosition = SelectedMesh->_position;
@@ -571,9 +578,24 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				SelectedMesh->setPosition(currentPosition);
 			}
 		}
-
+		if(state==GLUT_UP){
+			myCamera->rotationAngleX=0.0f;
+			myCamera->rotationAngleY=0.0f;
+			//myCamera->setUpdateVMatrixFlag(false);
+			canDrag=false;
+		}
 		break;
-		
+	}
+}
+
+void mouseMotion(int x, int y){
+
+	if (canDrag){
+		myCamera->rotationAngleY = (float)(x - lastMx);
+		myCamera->rotationAngleX = (float)(y - lastMy);
+		myCamera->setUpdateVMatrixFlag(true);
+		lastMx = x;
+		lastMy = y; 
 	}
 }
 
@@ -590,6 +612,7 @@ void setupCallbacks()
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboardSpecial);
 	glutMouseFunc(mouse);
+	glutMotionFunc(mouseMotion);
 }
 
 void setupOpenGL() {

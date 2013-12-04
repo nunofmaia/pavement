@@ -44,7 +44,7 @@ void main(void)
 	mat4 MV = ViewMatrix * MM * RM;
 	mat4 NM = transpose(inverse(MV));
 
-	v = vec3(MV * in_Position);
+	v = vec3(MV * Position);
 	n = vec3(normalize(NM * Normal));
 
 	gl_Position = ProjectionMatrix * ViewMatrix * MM * RM * Position;

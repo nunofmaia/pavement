@@ -12,7 +12,7 @@ Mesh::Mesh(int id)
 	_isCopy = false;
 	_canDraw = true;
 	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
-	_angle = 90.0f;
+	_angle = 0.0f;
 }
 
 Mesh::Mesh(Mesh* m) {

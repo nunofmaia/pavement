@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\Grid.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
@@ -26,6 +27,7 @@
     <None Include="..\src\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\Engine.h" />
     <ClInclude Include="..\src\Grid.h" />
     <ClInclude Include="..\src\Mesh.h" />

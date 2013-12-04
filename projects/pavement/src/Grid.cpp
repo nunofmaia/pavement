@@ -20,10 +20,10 @@ void Grid::setNlines(int lines){
 }
 
 void Grid::generateGrid(){
-	glm::vec4 startVerticalPoint(0.0 , 0.0, -100.0, 1.0);
-	glm::vec4 endVerticalPoint(0.0 , 0.0, 100.0, 1.0);
-	glm::vec4 startHorizontalPoint(-100.0 , 0.0, 0.0, 1.0);
-	glm::vec4 endHorizontalPoint(100.0 , 0.0, 0.0, 1.0);
+	glm::vec4 startVerticalPoint(0.0 , 0.0, -5.0, 1.0);
+	glm::vec4 endVerticalPoint(0.0 , 0.0, 5.0, 1.0);
+	glm::vec4 startHorizontalPoint(-5.0 , 0.0, 0.0, 1.0);
+	glm::vec4 endHorizontalPoint(5.0 , 0.0, 0.0, 1.0);
 	lines.push_back(startVerticalPoint);
 	lines.push_back(endVerticalPoint);
 	lines.push_back(startHorizontalPoint);

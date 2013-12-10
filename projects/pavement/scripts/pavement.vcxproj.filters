@@ -82,6 +82,9 @@
     <ClInclude Include="..\src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphscene.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\src\meshes\monkey.obj">

@@ -33,6 +33,7 @@
     <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\Utils.h" />
+    <ClInclude Include="graphscene.h" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\src\meshes\halfCube.obj">

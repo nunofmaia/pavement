@@ -4,6 +4,7 @@ Grid::Grid(int lines)
 {
 	_lines = lines;
 	_interval = 0.25f;
+	generateGrid();
 }
 
 Grid::Grid(int lines, GLfloat interval) : _lines(lines), _interval(interval) {
@@ -42,28 +43,72 @@ void Grid::generateGrid(){
 		lines.push_back(glm::vec4(startHorizontalPoint.x, startHorizontalPoint.y, startHorizontalPoint.z - _interval * i, startHorizontalPoint.w));
 		lines.push_back(glm::vec4(endHorizontalPoint.x, endHorizontalPoint.y, endHorizontalPoint.z - _interval * i, endHorizontalPoint.w));
 	}
-	/*for(int i=0; i<(int)lines.size();i++){
-		std::cout<<i+1<<" "<<lines[i].x<<" "<<lines[i].y<<" "<<lines[i].z<<std::endl;
-	}*/
+
+
+	for(int i=0; i<(int)lines.size();i++){
+		line_colors.push_back(glm::vec4(0.2, 0.2, 0.2, 1.0));
+		std::cout<<"COR"<<std::endl;
+	}
+	std::cout<<lines.size()<<" "<<line_colors.size()<<std::endl;
+}
+
+void Grid::highlightGrid(int n){
+	switch(n){
+	case 0:
+		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		break;
+	case 1:
+		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		break;
+	case 2:
+		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		break;
+	case 3:
+		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		break;
+	case 4:
+		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		break;
+	
+	}
+	createBufferObjects();
 }
 
 void Grid::createBufferObjects(){
-	generateGrid();
 	glGenVertexArrays(1, &VaoId);
 	glBindVertexArray(VaoId);
 
 	glGenBuffers(4, VboId);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[0]);
-
 	glBufferData(GL_ARRAY_BUFFER, lines.size()*sizeof(glm::vec4), &lines[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(VERTICES);
 	glVertexAttribPointer(VERTICES, 4, GL_FLOAT, GL_FALSE, sizeof( glm::vec4 ), 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
+	glBufferData(GL_ARRAY_BUFFER, line_colors.size()*sizeof(glm::vec4), &line_colors[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(COLORS);
+	glVertexAttribPointer(COLORS, 4, GL_FLOAT, GL_FALSE, sizeof( glm::vec4 ), 0);
+
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(COLORS);
 	glDisableVertexAttribArray(VERTICES);
-
 	//checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 

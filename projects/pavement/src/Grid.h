@@ -23,12 +23,13 @@ public:
 	void setNlines(int);
 	void generateGrid();
 	void drawGrid();
-
+	void highlightGrid(int);
 private:
 	int _lines;
 	GLfloat _interval;
 	GLuint VaoId, VboId[4];
 	std::vector< glm::vec4 > lines;
+	std::vector< glm::vec4 > line_colors;
 };
 
 #endif

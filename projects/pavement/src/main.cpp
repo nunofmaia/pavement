@@ -78,9 +78,6 @@ void checkOpenGLError(std::string error)
 /////////////////////////////////////////////////////////////////////// SHADERs
 
 void createMesh(std::string filePath){
-	/** /
-	mesh.loadMeshFile("../src/meshes/knot.obj");
-	/**/
 
 	// Original solid
 	Mesh* m = new Mesh(ID++);
@@ -470,29 +467,28 @@ void keyboard(unsigned char key, int x, int y) {
 		hideSolids(ReflectionX);
 		hideSolids(ReflectionZ);
 		hideSolids(ReflectionO);
+		grid.highlightGrid(0);
 		break;
 	case '1':
 		SymMode = SymmetryMode::XAXIS;
 		hideSolids(ReflectionZ);
 		hideSolids(ReflectionO);
-
 		showSolids(ReflectionX);
-
+		grid.highlightGrid(1);
 		break;
 	case '2':
 		SymMode = SymmetryMode::ZAXIS;
 		hideSolids(ReflectionX);
 		hideSolids(ReflectionO);
-
 		showSolids(ReflectionZ);
-
+		grid.highlightGrid(2);
 		break;
 	case '3':
 		SymMode = SymmetryMode::O;
 		hideSolids(ReflectionX);
 		hideSolids(ReflectionZ);
-
 		showSolids(ReflectionO);
+		grid.highlightGrid(3);
 		break;
 
 	case '4':
@@ -500,6 +496,7 @@ void keyboard(unsigned char key, int x, int y) {
 		showSolids(ReflectionX);
 		showSolids(ReflectionZ);
 		showSolids(ReflectionO);
+		grid.highlightGrid(4);
 		break;
 	}
 }

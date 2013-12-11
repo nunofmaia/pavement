@@ -134,4 +134,8 @@ void Mesh::reverseElements() {
 	std::reverse(normals.begin(), normals.end());
 }
 
-
+void Mesh::loadTextureFile(std::string filepath){
+	int width,height;
+	unsigned char* img = SOIL_load_image(filepath.c_str(), &width, &height, NULL, 0);
+	std::cout<<"Texture imported:"<<"Width: "<<width<<" Height: "<<height<<std::endl;
+}

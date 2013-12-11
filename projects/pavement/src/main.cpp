@@ -80,7 +80,7 @@ void checkOpenGLError(std::string error)
 
 /////////////////////////////////////////////////////////////////////// SHADERs
 
-void createMesh(std::string filePath){
+void createMesh(std::string filePath, std::string texturePath = ""){
 
 	// Original solid
 	Mesh* m = new Mesh();
@@ -142,6 +142,11 @@ void createMesh(std::string filePath){
 		nZ->_canDraw = false;
 		break;
 	}
+	
+	if(texturePath != "") {
+		m->loadTextureFile(texturePath);
+	}
+
 }
 
 //Mesh* findMesh(int id) {
@@ -455,7 +460,7 @@ void keyboard(unsigned char key, int x, int y) {
 		createMesh("../src/meshes/quarterCube.obj");
 		break;
 	case 'l':
-		createMesh("../src/meshes/cubeTest.obj");
+		createMesh("../src/meshes/cubeTest.obj", "../src/meshes/cubeTexture.png");
 		break;
 	case 'd':
 		Scene->deleteAllNodes();

@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream> 
 #include "Engine.h"
-
+#include "soil\src\SOIL.h"
 
 class Mesh
 {
@@ -37,6 +37,8 @@ public:
 	void addCopy(Mesh*);
 	void updateCopies();
 	void setPosition(glm::vec3);
+
+	void loadTextureFile(std::string filepath);
 
 private:
 	std::string meshString;

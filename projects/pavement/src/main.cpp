@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "Grid.h"
 #include "Camera.h"
+#include "SceneGraph.h"
 
 #define CAPTION "Tangram"
 
@@ -35,12 +36,14 @@ ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
 ShaderProgram *GridShader;
 
+SceneGraph *Scene = new SceneGraph();
+
 Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 Grid grid(20);
 
 int ID = 1;
 int lastMx = 0, lastMy = 0;
-Mesh* SelectedMesh;
+SceneNode* SelectedNode;
 
 std::map<ShaderProgram*, std::vector<Mesh*>*> MeshManager;
 enum SymmetryMode {
@@ -80,100 +83,110 @@ void checkOpenGLError(std::string error)
 void createMesh(std::string filePath){
 
 	// Original solid
-	Mesh* m = new Mesh(ID++);
+	Mesh* m = new Mesh();
+	SceneNode* n = new SceneNode(ID++, m, Shader);
 	m->loadMeshFile(filePath);
 	m->createBufferObjects();
-	m->_position = glm::vec3(0.125, 0.125, 0.125);
+	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
-	Mesh* x = new Mesh(m);
-	x->reverseElements();
-	x->_isCopy = true;
-	x->createBufferObjects();
+	//Mesh* x = new Mesh();
+	SceneNode* nX = new SceneNode(n, ReflectionX);
+	nX->_mesh->reverseElements();
+	nX->_mesh->createBufferObjects();
 
 	// Z reflection solid
-	Mesh* z = new Mesh(m);
-	z->reverseElements();
-	z->_isCopy = true;
-	z->createBufferObjects();
+	//Mesh* z = new Mesh();
+	SceneNode* nZ = new SceneNode(n, ReflectionZ);
+	nZ->_mesh->reverseElements();
+	nZ->_mesh->createBufferObjects();
 
 	// Origin reflection solid
-	Mesh* o = new Mesh(m);
-	o->_isCopy = true;
-	o->createBufferObjects();
+	//Mesh* o = new Mesh();
+	SceneNode* nO = new SceneNode(n, ReflectionO);
+	nO->_mesh->createBufferObjects();
 
 
-	m->addCopy(x);
-	m->addCopy(z);
-	m->addCopy(o);
+	//m->addCopy(x);
+	//m->addCopy(z);
+	//m->addCopy(o);
 
-	MeshManager[Shader]->push_back(m);
-	MeshManager[ReflectionX]->push_back(x);
-	MeshManager[ReflectionZ]->push_back(z);
-	MeshManager[ReflectionO]->push_back(o);
+	//MeshManager[Shader]->push_back(m);
+	//MeshManager[ReflectionX]->push_back(x);
+	//MeshManager[ReflectionZ]->push_back(z);
+	//MeshManager[ReflectionO]->push_back(o);
+
+	n->addCopy(nX);
+	n->addCopy(nZ);
+	n->addCopy(nO);
+	Scene->addNode(n);
 
 	switch (SymMode) {
 	case SymmetryMode::NONE:
-		x->_canDraw = false;
-		z->_canDraw = false;
-		o->_canDraw = false;
+		nX->_canDraw = false;
+		nZ->_canDraw = false;
+		nO->_canDraw = false;
 		break;
 	case SymmetryMode::XAXIS:
-		z->_canDraw = false;
-		o->_canDraw = false;
+		nZ->_canDraw = false;
+		nO->_canDraw = false;
 		break;
 	case SymmetryMode::ZAXIS:
-		x->_canDraw = false;
-		o->_canDraw = false;
+		nX->_canDraw = false;
+		nO->_canDraw = false;
 		break;
 	case SymmetryMode::XZAXIS:
 		break;
 	case SymmetryMode::O:
-		x->_canDraw = false;
-		z->_canDraw = false;
+		nX->_canDraw = false;
+		nZ->_canDraw = false;
 		break;
 	}
 }
 
-Mesh* findMesh(int id) {
-	std::vector<Mesh*>::iterator it;
-	for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
-		if ((*it)->_id == id) {
-			return (*it);
-		}
-	}
-
-	return NULL;
-
-}
+//Mesh* findMesh(int id) {
+//	std::vector<Mesh*>::iterator it;
+//	for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
+//		if ((*it)->_id == id) {
+//			return (*it);
+//		}
+//	}
+//
+//	return NULL;
+//
+//}
 
 void hideSolids(ShaderProgram* p) {
 
-	std::vector<Mesh*> *v = MeshManager[p];
+	//std::vector<Mesh*> *v = MeshManager[p];
 
-	std::vector<Mesh*>::iterator it;
-	for (it = v->begin(); it != v->end(); it++) {
-		(*it)->_canDraw = false;
-	}
-
+	//std::vector<Mesh*>::iterator it;
+	//for (it = v->begin(); it != v->end(); it++) {
+	//	(*it)->_canDraw = false;
+	//}
+	Scene->hideSolids(p);
 }
 
 void showSolids(ShaderProgram* p) {
 
-	std::vector<Mesh*> *v = MeshManager[p];
+	//std::vector<Mesh*> *v = MeshManager[p];
 
-	std::vector<Mesh*>::iterator it;
-	for (it = v->begin(); it != v->end(); it++) {
-		(*it)->_canDraw = true;
-	}
+	//std::vector<Mesh*>::iterator it;
+	//for (it = v->begin(); it != v->end(); it++) {
+	//	(*it)->_canDraw = true;
+	//}
+	
+	Scene->showSolids(p);
 
 }
 
 void deleteAllMeshes() {
-	MeshManager[Shader]->clear();
-	MeshManager[ReflectionX]->clear();
-	MeshManager[ReflectionZ]->clear();
-	MeshManager[ReflectionO]->clear();
+	//MeshManager[Shader]->clear();
+	//MeshManager[ReflectionX]->clear();
+	//MeshManager[ReflectionZ]->clear();
+	//MeshManager[ReflectionO]->clear();
+
+	//Scene->_nodes.clear();
 }
 
 void createShaderProgram()
@@ -354,18 +367,20 @@ void drawScene()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
-	std::map<ShaderProgram*, std::vector<Mesh*>*>::iterator it;
-	for (it = MeshManager.begin(); it != MeshManager.end(); it++) {
-		it->first->useShaderProgram();
-		
-		std::vector<Mesh*>::iterator ot;
-		for (ot = it->second->begin(); ot != it->second->end(); ot++) {
-			it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), (*ot)->_position));
-			it->first->setUniform("DefaultColor", (*ot)->_color);
-			it->first->setUniform("Angle", (*ot)->_angle);
-			(*ot)->draw();
-		}
-	}
+	//std::map<ShaderProgram*, std::vector<Mesh*>*>::iterator it;
+	//for (it = MeshManager.begin(); it != MeshManager.end(); it++) {
+	//	it->first->useShaderProgram();
+	//	
+	//	std::vector<Mesh*>::iterator ot;
+	//	for (ot = it->second->begin(); ot != it->second->end(); ot++) {
+	//		it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), (*ot)->_position));
+	//		it->first->setUniform("DefaultColor", (*ot)->_color);
+	//		it->first->setUniform("Angle", (*ot)->_angle);
+	//		(*ot)->draw();
+	//	}
+	//}
+
+	Scene->draw();
 
 	GridShader->useShaderProgram();
 
@@ -443,22 +458,22 @@ void keyboard(unsigned char key, int x, int y) {
 		createMesh("../src/meshes/cubeTest.obj");
 		break;
 	case 'd':
-		deleteAllMeshes();
+		Scene->deleteAllNodes();
 		break;
 	case 'p':
-		if(SelectedMesh != NULL){
-			SelectedMesh->setColor(glm::vec4(0.164, 0.168, 0.22, 1.0));
+		if(SelectedNode != NULL){
+			SelectedNode->setColor(glm::vec4(0.164, 0.168, 0.22, 1.0));
 		}
 		break;
 	case 'o':
-		if(SelectedMesh != NULL){
-			SelectedMesh->setColor(glm::vec4(1.0, 0.98, 0.92, 1.0));
+		if(SelectedNode != NULL){
+			SelectedNode->setColor(glm::vec4(1.0, 0.98, 0.92, 1.0));
 		}
 		break;
 	case 'r':
-		if(SelectedMesh != NULL){
-			GLfloat newAngle = SelectedMesh->_angle + 90.0f;
-			SelectedMesh->setAngle(newAngle);
+		if(SelectedNode != NULL){
+			GLfloat newAngle = SelectedNode->_angle + 90.0f;
+			SelectedNode->setAngle(newAngle);
 		}
 		break;
 	/*case 'l':
@@ -507,33 +522,33 @@ void keyboard(unsigned char key, int x, int y) {
 void keyboardSpecial(int key, int x, int y) {
 	switch (key) {
 	case GLUT_KEY_LEFT:
-		if (SelectedMesh != NULL) {
-			glm::vec3 newPosition = SelectedMesh->_position;
+		if (SelectedNode != NULL) {
+			glm::vec3 newPosition = SelectedNode->_position;
 			newPosition.x -= 0.125;
-			SelectedMesh->setPosition(newPosition);
+			SelectedNode->setPosition(newPosition);
 		}
 
 		break;
 	case GLUT_KEY_RIGHT:
-		if (SelectedMesh != NULL) {
-			glm::vec3 newPosition = SelectedMesh->_position;
+		if (SelectedNode != NULL) {
+			glm::vec3 newPosition = SelectedNode->_position;
 			newPosition.x += 0.125;
-			SelectedMesh->setPosition(newPosition);
+			SelectedNode->setPosition(newPosition);
 		}
 		break;
 	case GLUT_KEY_UP:
-		if (SelectedMesh != NULL) {
-			glm::vec3 newPosition = SelectedMesh->_position;
+		if (SelectedNode != NULL) {
+			glm::vec3 newPosition = SelectedNode->_position;
 			newPosition.z -= 0.125;
-			SelectedMesh->setPosition(newPosition);
+			SelectedNode->setPosition(newPosition);
 		}
 
 		break;
 	case GLUT_KEY_DOWN:
-		if (SelectedMesh != NULL) {
-			glm::vec3 newPosition = SelectedMesh->_position;
+		if (SelectedNode != NULL) {
+			glm::vec3 newPosition = SelectedNode->_position;
 			newPosition.z += 0.125;
-			SelectedMesh->setPosition(newPosition);
+			SelectedNode->setPosition(newPosition);
 		}
 		break;
 	}
@@ -557,25 +572,25 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 
 			std::cout << "Stencil data: " << data << std::endl;
 			if (data == 0) {
-				if (SelectedMesh != NULL) {
-					glm::vec3 currentPosition = SelectedMesh->_position;
+				if (SelectedNode != NULL) {
+					glm::vec3 currentPosition = SelectedNode->_position;
 					currentPosition.y -= 0.25;
-					SelectedMesh->setPosition(currentPosition);
+					SelectedNode->setPosition(currentPosition);
 				}
 
-				SelectedMesh = NULL;
+				SelectedNode = NULL;
 				canDrag=true;
 			} else {
-				if (SelectedMesh != NULL) {
-					glm::vec3 currentPosition = SelectedMesh->_position;
+				if (SelectedNode != NULL) {
+					glm::vec3 currentPosition = SelectedNode->_position;
 					currentPosition.y -= 0.25;
-					SelectedMesh->setPosition(currentPosition);
+					SelectedNode->setPosition(currentPosition);
 				}
 
-				SelectedMesh = findMesh(GLint(data));
-				glm::vec3 currentPosition = SelectedMesh->_position;
+				SelectedNode = Scene->findNode(GLint(data));
+				glm::vec3 currentPosition = SelectedNode->_position;
 				currentPosition.y += 0.25;
-				SelectedMesh->setPosition(currentPosition);
+				SelectedNode->setPosition(currentPosition);
 			}
 		}
 		if(state==GLUT_UP){

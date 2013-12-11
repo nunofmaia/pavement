@@ -15,22 +15,15 @@
 class Mesh
 {
 public:
-	int _id;
-	glm::vec3 _position;
-	GLfloat _angle;
-	bool _isCopy;
-	bool _canDraw;
+	
 	std::vector< glm::vec4 > vertices;
 	std::vector< glm::vec4 > normals;
 	std::vector< glm::vec4 > textures;
-	glm::vec4 _color;
 
 	Mesh(void);
-	Mesh(int);
 	Mesh(Mesh*);
 	~Mesh(void);
 
-	void setColor(glm::vec4 color);
 	void setAngle(GLfloat);
 
 	void parse();
@@ -46,7 +39,6 @@ public:
 	void setPosition(glm::vec3);
 
 private:
-	std::vector<Mesh*> _copies;
 	std::string meshString;
 
 	std::vector< glm::vec4 > vertexIndices;

@@ -6,25 +6,9 @@ Mesh::Mesh(void)
 	readUV=false;
 }
 
-Mesh::Mesh(int id)
-{
-	readMtl=false;
-	readUV=false;
-	_id = id;
-	_isCopy = false;
-	_canDraw = true;
-	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
-	_angle = 0.0f;
-}
-
 Mesh::Mesh(Mesh* m) {
-	_id = m->_id;
-	_position = m->_position;
-	_isCopy = true;
 	vertices = m->vertices;
 	normals = m->normals;
-	_color = m->_color;
-	_angle = m->_angle;
 }
 
 
@@ -99,14 +83,6 @@ void Mesh::parse(){
 
 }
 
-void Mesh::setColor(glm::vec4 color){
-	_color = color;
-	std::vector<Mesh*>::iterator it;
-	for (it = _copies.begin(); it != _copies.end(); it++) {
-		(*it)->_color = color;
-	}
-}
-
 void Mesh::loadMeshFile(std::string filePath){
 	meshString = Utils::readFile(filePath);
 	parse();
@@ -148,22 +124,9 @@ void Mesh::createBufferObjects(){
 
 void Mesh::draw(){
 
-
-	if(_canDraw) {
-
-		glBindVertexArray(VaoId);
-
-		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilFunc(GL_ALWAYS, _id, 0xFF);
-
-
-		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-		glBindVertexArray(0);
-
-		glDisable(GL_STENCIL_TEST);
-	}
-
+	glBindVertexArray(VaoId);
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+	glBindVertexArray(0);
 }
 
 void Mesh::reverseElements() {
@@ -171,29 +134,4 @@ void Mesh::reverseElements() {
 	std::reverse(normals.begin(), normals.end());
 }
 
-void Mesh::addCopy(Mesh* copy) {
-	_copies.push_back(copy);
-}
 
-void Mesh::updateCopies() {
-	std::vector<Mesh*>::iterator it;
-	for (it = _copies.begin(); it != _copies.end(); it++) {
-		(*it)->setPosition(_position);
-	}
-
-}
-
-void Mesh::setPosition(glm::vec3 pos) {
-	_position = pos;
-	if (!_isCopy) {
-		updateCopies();
-	}
-}
-
-void Mesh::setAngle(GLfloat angle) {
-	_angle = angle;
-	std::vector<Mesh*>::iterator it;
-	for (it = _copies.begin(); it != _copies.end(); it++) {
-		(*it)->_angle = angle;
-	}
-}

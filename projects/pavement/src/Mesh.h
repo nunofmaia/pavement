@@ -22,6 +22,7 @@ public:
 	bool _canDraw;
 	std::vector< glm::vec4 > vertices;
 	std::vector< glm::vec4 > normals;
+	std::vector< glm::vec4 > textures;
 	glm::vec4 _color;
 
 	Mesh(void);
@@ -50,7 +51,9 @@ private:
 
 	std::vector< glm::vec4 > vertexIndices;
 	std::vector< glm::vec4 > normalIndices;
-	bool readMtl;
+	std::vector< glm::vec4 > textureIndices;
+	bool readMtl,readUV;
+
 	GLuint VaoId, VboId[4];
 };
 

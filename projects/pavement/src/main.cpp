@@ -439,6 +439,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'm':
 		createMesh("../src/meshes/quarterCube.obj");
 		break;
+	case 'l':
+		createMesh("../src/meshes/cubeTest.obj");
+		break;
 	case 'd':
 		deleteAllMeshes();
 		break;
@@ -458,10 +461,10 @@ void keyboard(unsigned char key, int x, int y) {
 			SelectedMesh->setAngle(newAngle);
 		}
 		break;
-	case 'l':
+	/*case 'l':
 		std::cout<<"restart"<<std::endl;
 		myCamera->restartCamera();
-		break;
+		break;*/
 	case '0':
 		SymMode = SymmetryMode::NONE;
 		hideSolids(ReflectionX);

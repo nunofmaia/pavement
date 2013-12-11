@@ -47,7 +47,6 @@ void Grid::generateGrid(){
 
 	for(int i=0; i<(int)lines.size();i++){
 		line_colors.push_back(glm::vec4(0.2, 0.2, 0.2, 1.0));
-		std::cout<<"COR"<<std::endl;
 	}
 	std::cout<<lines.size()<<" "<<line_colors.size()<<std::endl;
 }

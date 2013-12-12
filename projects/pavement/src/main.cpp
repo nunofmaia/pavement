@@ -90,31 +90,18 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
-	//Mesh* x = new Mesh();
 	SceneNode* nX = new SceneNode(n, ReflectionX);
 	nX->_mesh->reverseElements();
 	nX->_mesh->createBufferObjects();
 
 	// Z reflection solid
-	//Mesh* z = new Mesh();
 	SceneNode* nZ = new SceneNode(n, ReflectionZ);
 	nZ->_mesh->reverseElements();
 	nZ->_mesh->createBufferObjects();
 
 	// Origin reflection solid
-	//Mesh* o = new Mesh();
 	SceneNode* nO = new SceneNode(n, ReflectionO);
 	nO->_mesh->createBufferObjects();
-
-
-	//m->addCopy(x);
-	//m->addCopy(z);
-	//m->addCopy(o);
-
-	//MeshManager[Shader]->push_back(m);
-	//MeshManager[ReflectionX]->push_back(x);
-	//MeshManager[ReflectionZ]->push_back(z);
-	//MeshManager[ReflectionO]->push_back(o);
 
 	n->addCopy(nX);
 	n->addCopy(nZ);
@@ -149,50 +136,6 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 
 }
 
-//Mesh* findMesh(int id) {
-//	std::vector<Mesh*>::iterator it;
-//	for (it = MeshManager[Shader]->begin(); it != MeshManager[Shader]->end(); it++) {
-//		if ((*it)->_id == id) {
-//			return (*it);
-//		}
-//	}
-//
-//	return NULL;
-//
-//}
-
-void hideSolids(ShaderProgram* p) {
-
-	//std::vector<Mesh*> *v = MeshManager[p];
-
-	//std::vector<Mesh*>::iterator it;
-	//for (it = v->begin(); it != v->end(); it++) {
-	//	(*it)->_canDraw = false;
-	//}
-	Scene->hideSolids(p);
-}
-
-void showSolids(ShaderProgram* p) {
-
-	//std::vector<Mesh*> *v = MeshManager[p];
-
-	//std::vector<Mesh*>::iterator it;
-	//for (it = v->begin(); it != v->end(); it++) {
-	//	(*it)->_canDraw = true;
-	//}
-	
-	Scene->showSolids(p);
-
-}
-
-void deleteAllMeshes() {
-	//MeshManager[Shader]->clear();
-	//MeshManager[ReflectionX]->clear();
-	//MeshManager[ReflectionZ]->clear();
-	//MeshManager[ReflectionO]->clear();
-
-	//Scene->_nodes.clear();
-}
 
 void createShaderProgram()
 {
@@ -371,20 +314,6 @@ void drawScene()
 	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-
-	//std::map<ShaderProgram*, std::vector<Mesh*>*>::iterator it;
-	//for (it = MeshManager.begin(); it != MeshManager.end(); it++) {
-	//	it->first->useShaderProgram();
-	//	
-	//	std::vector<Mesh*>::iterator ot;
-	//	for (ot = it->second->begin(); ot != it->second->end(); ot++) {
-	//		it->first->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), (*ot)->_position));
-	//		it->first->setUniform("DefaultColor", (*ot)->_color);
-	//		it->first->setUniform("Angle", (*ot)->_angle);
-	//		(*ot)->draw();
-	//	}
-	//}
-
 	Scene->draw();
 
 	GridShader->useShaderProgram();
@@ -487,38 +416,38 @@ void keyboard(unsigned char key, int x, int y) {
 		break;*/
 	case '0':
 		SymMode = SymmetryMode::NONE;
-		hideSolids(ReflectionX);
-		hideSolids(ReflectionZ);
-		hideSolids(ReflectionO);
+		Scene->hideSolids(ReflectionX);
+		Scene->hideSolids(ReflectionZ);
+		Scene->hideSolids(ReflectionO);
 		grid.highlightGrid(0);
 		break;
 	case '1':
 		SymMode = SymmetryMode::XAXIS;
-		hideSolids(ReflectionZ);
-		hideSolids(ReflectionO);
-		showSolids(ReflectionX);
+		Scene->hideSolids(ReflectionZ);
+		Scene->hideSolids(ReflectionO);
+		Scene->showSolids(ReflectionX);
 		grid.highlightGrid(1);
 		break;
 	case '2':
 		SymMode = SymmetryMode::ZAXIS;
-		hideSolids(ReflectionX);
-		hideSolids(ReflectionO);
-		showSolids(ReflectionZ);
+		Scene->hideSolids(ReflectionX);
+		Scene->hideSolids(ReflectionO);
+		Scene->showSolids(ReflectionZ);
 		grid.highlightGrid(2);
 		break;
 	case '3':
 		SymMode = SymmetryMode::O;
-		hideSolids(ReflectionX);
-		hideSolids(ReflectionZ);
-		showSolids(ReflectionO);
+		Scene->hideSolids(ReflectionX);
+		Scene->hideSolids(ReflectionZ);
+		Scene->showSolids(ReflectionO);
 		grid.highlightGrid(3);
 		break;
 
 	case '4':
 		SymMode = SymmetryMode::XZAXIS;
-		showSolids(ReflectionX);
-		showSolids(ReflectionZ);
-		showSolids(ReflectionO);
+		Scene->showSolids(ReflectionX);
+		Scene->showSolids(ReflectionZ);
+		Scene->showSolids(ReflectionO);
 		grid.highlightGrid(4);
 		break;
 	}
@@ -682,7 +611,6 @@ void init(int argc, char* argv[])
 	setupGLUT(argc, argv);
 	setupGLEW();
 	setupOpenGL();
-	//createMeshes();
 	createShaderProgram();
 	createBufferObjects();
 	setupCallbacks();

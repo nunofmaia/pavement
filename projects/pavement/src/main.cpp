@@ -22,6 +22,7 @@
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 
 int WinX = 640, WinY = 640;
+int Win2X = 640, Win2Y = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
 bool canDrag=false;
@@ -84,9 +85,9 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 
 	// Original solid
 	Mesh* m = new Mesh();
-	SceneNode* n = new SceneNode(ID++, m, Shader);
-	m->loadMeshFile(filePath);
+	m->loadMeshFile(filePath,texturePath);
 	m->createBufferObjects();
+	SceneNode* n = new SceneNode(ID++, m, Shader);
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
@@ -143,10 +144,6 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 		break;
 	}
 	
-	if(texturePath != "") {
-		m->loadTextureFile(texturePath);
-	}
-
 }
 
 //Mesh* findMesh(int id) {
@@ -202,7 +199,7 @@ void createShaderProgram()
 	Shader->addShaderFromFile(VERTEX_SHADER_FILE, GL_VERTEX_SHADER);
 	Shader->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
 	Shader->bindAttribLocation(VERTICES, "in_Position");
-	Shader->bindAttribLocation(COLORS, "in_Color");
+	Shader->bindAttribLocation(TEXTURES, "in_Texcoord");
 	Shader->bindAttribLocation(NORMALS, "in_Normal");
 	Shader->linkShaderProgram();
 
@@ -316,52 +313,6 @@ void destroyBufferObjects()
 
 /////////////////////////////////////////////////////////////////////// SCENE
 
-const Matrix I = {
-	1.0f,  0.0f,  0.0f,  0.0f,
-	0.0f,  1.0f,  0.0f,  0.0f,
-	0.0f,  0.0f,  1.0f,  0.0f,
-	0.0f,  0.0f,  0.0f,  1.0f
-};
-
-const Matrix ModelMatrix = {
-	1.0f,  0.0f,  0.0f,  0.0f,
-    0.0f,  1.0f,  0.0f,  0.0f,
-	0.0f,  0.0f,  1.0f,  0.0f,
-   -0.5f, -0.5f, -0.5f,  1.0f
-}; // Column Major
-
-// Eye(5,5,5) Center(0,0,0) Up(0,1,0)
-const Matrix ViewMatrix1 = {
-    0.70f, -0.41f,  0.58f,  0.00f,
-	0.00f,  0.82f,  0.58f,  0.00f,
-   -0.70f, -0.41f,  0.58f,  0.00f,
-	0.00f,  0.00f, -8.70f,  1.00f
-}; // Column Major
-
-// Eye(-5,-5,-5) Center(0,0,0) Up(0,1,0)
-const Matrix ViewMatrix2 = {
-   -0.70f, -0.41f, -0.58f,  0.00f,
-	0.00f,  0.82f, -0.58f,  0.00f,
-    0.70f, -0.41f, -0.58f,  0.00f,
-	0.00f,  0.00f, -8.70f,  1.00f
-}; // Column Major
-
-// Orthographic LeftRight(-2,2) TopBottom(-2,2) NearFar(1,10)
-const Matrix ProjectionMatrix1 = {
-	0.50f,  0.00f,  0.00f,  0.00f,
-	0.00f,  0.50f,  0.00f,  0.00f,
-	0.00f,  0.00f, -0.22f,  0.00f,
-	0.00f,  0.00f, -1.22f,  1.00f
-}; // Column Major
-
-// Perspective Fovy(30) Aspect(640/480) NearZ(1) FarZ(10)
-const Matrix ProjectionMatrix2 = {
-	2.79f,  0.00f,  0.00f,  0.00f,
-	0.00f,  3.73f,  0.00f,  0.00f,
-	0.00f,  0.00f, -1.22f, -1.00f,
-	0.00f,  0.00f, -2.22f,  0.00f
-}; // Column Major
-
 void drawScene()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
@@ -460,7 +411,7 @@ void keyboard(unsigned char key, int x, int y) {
 		createMesh("../src/meshes/quarterCube.obj");
 		break;
 	case 'l':
-		createMesh("../src/meshes/cubeTest.obj", "../src/meshes/cubeTexture.png");
+		createMesh("../src/meshes/cubeTest.obj", "../src/meshes/noiseTexture.png");
 		break;
 	case 'd':
 		Scene->deleteAllNodes();

@@ -18,7 +18,7 @@ public:
 	
 	std::vector< glm::vec4 > vertices;
 	std::vector< glm::vec4 > normals;
-	std::vector< glm::vec4 > textures;
+	std::vector< glm::vec2 > textures;
 
 	Mesh(void);
 	Mesh(Mesh*);
@@ -27,7 +27,7 @@ public:
 	void setAngle(GLfloat);
 
 	void parse();
-	void loadMeshFile(std::string filePath);
+	void loadMeshFile(std::string filePath, std::string texturePath);
 	void printMesh();
 	void createBufferObjects();
 	void draw();
@@ -38,17 +38,20 @@ public:
 	void updateCopies();
 	void setPosition(glm::vec3);
 
-	void loadTextureFile(std::string filepath);
+	void loadTextureFile(GLuint pId);
 
 private:
 	std::string meshString;
 
 	std::vector< glm::vec4 > vertexIndices;
 	std::vector< glm::vec4 > normalIndices;
-	std::vector< glm::vec4 > textureIndices;
-	bool readMtl,readUV;
+	std::vector< glm::vec2 > textureIndices;
 
-	GLuint VaoId, VboId[4];
+	bool readMtl,readUV,hasTexture;
+
+	GLuint VaoId, VboId[4], textureId, pId;
+	
+	std::string texturePath;
 };
 
 

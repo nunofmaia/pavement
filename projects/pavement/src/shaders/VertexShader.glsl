@@ -3,9 +3,12 @@
 in vec4 in_Position;
 in vec4 in_Color;
 in vec4 in_Normal;
+in vec2 in_TexCoord;
+
 out vec4 ex_Color;
 out vec3 v;
 out vec3 n;
+out vec2 ex_TexCoord;
 
 uniform mat4 ModelMatrix;
 uniform vec4 DefaultColor;
@@ -37,7 +40,7 @@ void main(void)
 	mat4 NM = transpose(inverse(MV));
 
 	v = vec3(MV * in_Position);
-	n = vec3(NM * in_Normal);
+	n= vec3(NM * in_Normal);
 	ex_Color = DefaultColor;
-	
+	ex_TexCoord = in_TexCoord;
 }

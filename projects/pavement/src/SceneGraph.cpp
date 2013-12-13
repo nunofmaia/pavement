@@ -7,6 +7,7 @@ SceneNode::SceneNode() {
 
 SceneNode::SceneNode(int id, Mesh* mesh, ShaderProgram* shader) {
 	_mesh = mesh;
+	_mesh->loadTextureFile(shader->getProgramId());
 	_shader = shader;
 	_id = id;
 	_canDraw = true;

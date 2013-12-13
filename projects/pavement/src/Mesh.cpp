@@ -4,11 +4,15 @@ Mesh::Mesh(void)
 {
 	readMtl=false;
 	readUV=false;
+	hasTexture=false;
 }
 
 Mesh::Mesh(Mesh* m) {
 	vertices = m->vertices;
 	normals = m->normals;
+	textures = m->textures;
+	readUV=false;
+	hasTexture=false;
 }
 
 
@@ -35,7 +39,8 @@ void Mesh::parse(){
 					normalIndices.push_back(glm::vec4(vertice,1.0f));
 				else 
 					if(data[1] == 't'){
-						textureIndices.push_back(glm::vec4(vertice,1.0f));
+						vertice.t = 1 - vertice.t;
+						textureIndices.push_back(glm::vec2(vertice));
 						readUV=true;
 					}
 					else readUV=false;
@@ -83,7 +88,11 @@ void Mesh::parse(){
 
 }
 
-void Mesh::loadMeshFile(std::string filePath){
+void Mesh::loadMeshFile(std::string filePath,std::string texturePath = "" ){
+	if(texturePath != ""){
+		Mesh::texturePath = texturePath;
+		hasTexture = true;
+	}
 	meshString = Utils::readFile(filePath);
 	parse();
 	std::cerr<<"Mesh : "<<filePath<<std::endl<<" Vertices: "<<vertices.size()<<" Normals: "<<normals.size()<<" UV: "<<textures.size()<<" Vertex Indices: "<< vertexIndices.size()<<" normal Indices: "<< normalIndices.size()<<" Texture Indices: "<< textureIndices.size()<<std::endl<<std::endl;
@@ -105,11 +114,19 @@ void Mesh::createBufferObjects(){
 	glGenBuffers(4, VboId);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[0]);
-
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(glm::vec4), &vertices[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(VERTICES);
 	glVertexAttribPointer(VERTICES, 4, GL_FLOAT, GL_FALSE, sizeof( glm::vec4 ), 0);
 	
+
+	if (readUV)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
+		glBufferData(GL_ARRAY_BUFFER, textures.size()*sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(TEXTURES);
+		glVertexAttribPointer(TEXTURES, 2, GL_FLOAT, GL_FALSE, sizeof( glm::vec2 ), 0); 
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[3]);
 	glBufferData(GL_ARRAY_BUFFER, normals.size()*sizeof(glm::vec4), &normals[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(NORMALS);
@@ -117,7 +134,8 @@ void Mesh::createBufferObjects(){
 
 	glBindVertexArray(0);
 	glDisableVertexAttribArray(VERTICES);
-	glDisableVertexAttribArray(COLORS);
+	glDisableVertexAttribArray(TEXTURES);
+	glDisableVertexAttribArray(NORMALS);
 
 	//checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
@@ -125,8 +143,16 @@ void Mesh::createBufferObjects(){
 void Mesh::draw(){
 
 	glBindVertexArray(VaoId);
+	if (hasTexture)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		GLint uniform_mytexture = glGetUniformLocation(pId, "texture_uniform");
+		glUniform1i(uniform_mytexture, /*GL_TEXTURE*/0); 
+	}
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 	glBindVertexArray(0);
+	//glDeleteTextures(1, &texture_id)
 }
 
 void Mesh::reverseElements() {
@@ -134,8 +160,22 @@ void Mesh::reverseElements() {
 	std::reverse(normals.begin(), normals.end());
 }
 
-void Mesh::loadTextureFile(std::string filepath){
-	int width,height;
-	unsigned char* img = SOIL_load_image(filepath.c_str(), &width, &height, NULL, 0);
-	std::cout<<"Texture imported:"<<"Width: "<<width<<" Height: "<<height<<std::endl;
+void Mesh::loadTextureFile(GLuint pId){
+	
+	
+
+	if (hasTexture)
+	{
+		Mesh::pId=pId;
+
+		int width,height;
+		unsigned char* img = SOIL_load_image(texturePath.c_str(), &width, &height, NULL, SOIL_LOAD_RGB);
+		std::cout<<"Texture imported:"<<"Width: "<<width<<" Height: "<<height<<std::endl;
+
+		glGenTextures(1, &textureId);
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+	}
 }

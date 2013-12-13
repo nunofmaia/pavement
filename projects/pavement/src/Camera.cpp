@@ -43,17 +43,20 @@ void Camera::updateViewMatrix(){
 	if(updateVMatrixFlag) {
 		if (!restartViewMatrixFlag)	{
 
+			/**/						//ONLY HORIZONTAL ROTATION
 			//quaternion y Rotation
 			glm::quat q1 = glm::angleAxis(rotationAngleY,yAxis);
-			/*glm::mat4 m1 = glm::mat4_cast(q1);*/
-
-			//quaternion x Rotation
-			//glm::quat q2 = glm::angleAxis(rotationAngleX,xAxis);
-			//glm::mat4 m2 = glm::mat4_cast(q2);
-
-			currentQ = (q1/**q2*/);
+			currentQ = (q1);
 			glm::mat4 mf = glm::mat4_cast(currentQ);
-
+			
+			/** /						//DEBUG ROTATION
+			glm::quat q1 = glm::angleAxis(rotationAngleY,yAxis);
+			glm::mat4 m1 = glm::mat4_cast(q1);
+			glm::quat q2 = glm::angleAxis(rotationAngleX,xAxis);
+			glm::mat4 m2 = glm::mat4_cast(q2);
+			currentQ = (q1*q2);
+			glm::mat4 mf = glm::mat4_cast(currentQ);
+			/**/
 
 			// combining the 2 quaternion rotations into one single quaternion
 			viewMatrix*=mf;

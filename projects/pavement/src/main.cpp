@@ -21,6 +21,8 @@
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 
+
+
 int WinX = 640, WinY = 640;
 int Win2X = 640, Win2Y = 640;
 int WindowHandle = 0;
@@ -565,6 +567,8 @@ void init(int argc, char* argv[])
 	createShaderProgram();
 	createBufferObjects();
 	setupCallbacks();
+	//float lol = cnoise(glm::vec2(1,2));
+	//std::cout<<"lol "<<lol<<std::endl;
 }
 
 int main(int argc, char* argv[])

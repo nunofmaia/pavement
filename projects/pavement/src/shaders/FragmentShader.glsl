@@ -9,61 +9,60 @@ out vec4 out_Color;
 
 uniform sampler2D texture_uniform;
 
-float persistence;
-float octaves;
+#define ONE 0.00390625
+#define ONEHALF 0.001953125
+// The numbers above are 1/256 and 0.5/256, change accordingly
+// if you change the code to use another texture size.
 
 
-float Noise(int x, int y){
-   int nn = x + y * 57;
-   float a = pow((nn<<13), float(nn));
-   return ( 1.0 - ( int(a * (a * a * 15731 + 789221) + 1376312589) & int(0x7fffffff)) / 1073741824.0);    
+/*
+ * The interpolation function. This could be a 1D texture lookup
+ * to get some more speed, but it's not the main part of the algorithm.
+ */
+float fade(float t) {
+  // return t*t*(3.0-2.0*t); // Old fade, yields discontinuous second derivative
+  return t*t*t*(t*(t*6.0-15.0)+10.0); // Improved fade, yields C2-continuous noise
 }
 
-  float SmoothNoise(int x, int y){
-	float corners = ( Noise(x-1, y-1)+Noise(x+1, y-1)+Noise(x-1, y+1)+Noise(x+1, y+1) ) / 16;
-	float sides   = ( Noise(x-1, y)  +Noise(x+1, y)  +Noise(x, y-1)  +Noise(x, y+1) ) /  8;
-	float center  =  Noise(x, y) / 4;
-	return (corners + sides + center);
-  }
 
-  float InterpolatedNoise(float x, float y){
+/*
+ * 2D classic Perlin noise. Fast, but less useful than 3D noise.
+ */
+float noise(vec2 P)
+{
+  vec2 Pi = ONE*floor(P)+ONEHALF; // Integer part, scaled and offset for texture lookup
+  vec2 Pf = fract(P);             // Fractional part for interpolation
 
-      int integer_X    = int(x);
-      float fractional_X = x - integer_X;
+  // Noise contribution from lower left corner
+  vec2 grad00 = texture2D(texture_uniform, Pi).rg * 4.0 - 1.0;
+  float n00 = dot(grad00, Pf);
 
-      int integer_Y    = int(y);
-      float fractional_Y = y - integer_Y;
+  // Noise contribution from lower right corner
+  vec2 grad10 = texture2D(texture_uniform, Pi + vec2(ONE, 0.0)).rg * 4.0 - 1.0;
+  float n10 = dot(grad10, Pf - vec2(1.0, 0.0));
 
-     float v1 = SmoothNoise(integer_X,     integer_Y);
-     float v2 = SmoothNoise(integer_X + 1, integer_Y);
-     float v3 = SmoothNoise(integer_X,     integer_Y + 1);
-     float v4 = SmoothNoise(integer_X + 1, integer_Y + 1);
+  // Noise contribution from upper left corner
+  vec2 grad01 = texture2D(texture_uniform, Pi + vec2(0.0, ONE)).rg * 4.0 - 1.0;
+  float n01 = dot(grad01, Pf - vec2(0.0, 1.0));
 
-     float i1 = mix(v1 , v2 , fractional_X);
-     float i2 = mix(v3 , v4 , fractional_X);
+  // Noise contribution from upper right corner
+  vec2 grad11 = texture2D(texture_uniform, Pi + vec2(ONE, ONE)).rg * 4.0 - 1.0;
+  float n11 = dot(grad11, Pf - vec2(1.0, 1.0));
 
-     return mix(i1 , i2 , fractional_Y);
+  // Blend contributions along x
+  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade(Pf.x));
+
+  // Blend contributions along y
+  float n_xy = mix(n_x.x, n_x.y, fade(Pf.y));
+
+  // We're done, return the final noise value.
+  return n_xy;
 }
 
-float PerlinNoise_2D(float x, float y){
-
-      float total = 0;
-	  float p = persistence;
-      float n = octaves - 1;
-
-      for(int i = 0 ; i < n ; i++){ 
-
-          float frequency = 2*i;
-          float amplitude = p*i;
-
-          total = total + InterpolatedNoise(x * frequency, y * frequency) * amplitude;
-
-      }
-
-      return total;
-
+float rand(vec2 co){
+	float ret = fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    return ret;
 }
-
 
 void main(void) {
 
@@ -89,6 +88,11 @@ void main(void) {
 	vec4 Ispec = pow(max(dot(R, E), 0.0), 0.3 * shininess) * specularLight;
 	Ispec = clamp(Ispec, 0.0, 1.0);
 
+
+
+	float val = noise(ex_TexCoord);
+	out_Color = texture2D(texture_uniform, ex_TexCoord*val) * (Idiff + Iamb + Ispec);
+
+	//float n1 = (cnoise(textureCoordinate * scale) + 1.0) / 2.0; 
 	
-	out_Color = texture2D(texture_uniform, ex_TexCoord) * (Idiff + Iamb + Ispec);
-}
+	}

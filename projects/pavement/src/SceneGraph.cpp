@@ -140,6 +140,16 @@ void SceneGraph::deleteAllNodes() {
 	_nodes.clear();
 }
 
+void SceneGraph::deleteNode(SceneNode* n) {
+	std::vector<SceneNode*>::iterator it;
+	for (it = _nodes.begin(); it != _nodes.end(); ++it) {
+		if ((*it)->_id == n->_id) {
+			_nodes.erase(it);
+			return;
+		}
+	}
+}
+
 SceneNode* SceneGraph::findNode(int id) {
 	std::vector<SceneNode*>::iterator it;
 	for (it = _nodes.begin(); it != _nodes.end(); ++it) {

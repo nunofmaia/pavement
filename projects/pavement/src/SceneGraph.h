@@ -44,6 +44,7 @@ struct SceneGraph {
 	void hideSolids(ShaderProgram*);
 	void showSolids(ShaderProgram*);
 	void deleteAllNodes();
+	void deleteNode(SceneNode*);
 	SceneNode* findNode(int);
 };
 

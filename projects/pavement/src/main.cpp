@@ -403,9 +403,9 @@ void drawScene()
 /////////////////////////////////////////////////////////////////////// CALLBACKS
 
 
-void saveScene() {
+void saveScene(std::string fileName) {
 	std::ofstream myfile;
-	myfile.open ("scene.txt");
+	myfile.open (fileName);
 	std::vector<SceneNode*>::iterator it;
 
 	for (it = Scene->_nodes.begin(); it != Scene->_nodes.end(); ++it) {
@@ -423,27 +423,33 @@ void saveScene() {
 	std::cout << ">>>>> SCENE SAVED <<<<<" << std::endl;
 }
 
-void loadScene() {
+void loadScene(std::string fileName) {
 	std::cout << "<<<<< LOADING >>>>>" << std::endl;
-	std::ifstream myfile("scene.txt");
+	std::ifstream myfile(fileName);
 	std::string line;
-	std::vector<float> fields;
-
+	
 	if (myfile.is_open()) {
 		ID = 1;
 		Scene->deleteAllNodes();
 		while (getline(myfile, line)) {
-			char* next = NULL;
-			char* temp = strtok_s((char*)line.c_str(), " ", &next);
-			while (temp != NULL) {
-				fields.push_back((float)atof(temp));
-				temp = strtok_s(NULL, " ", &next);
-			}
-			SceneNode* node = createMesh((int)fields[0]);
-			node->setPosition(glm::vec3(fields[1], fields[2], fields[3]));
-			node->setColor(glm::vec4(fields[4], fields[5], fields[6], fields[7]));
-			node->setAngle(fields[8]);
-			fields.clear();
+			std::stringstream linestream(line);
+			int shape;
+			glm::vec3 position;
+			glm::vec4 color;
+			GLfloat angle;
+			linestream >> shape;
+			linestream >> position.x;
+			linestream >> position.y;
+			linestream >> position.z;
+			linestream >> color.r;
+			linestream >> color.g;
+			linestream >> color.b;
+			linestream >> color.a;
+			linestream >> angle;
+			SceneNode* node = createMesh(shape);
+			node->setPosition(position);
+			node->setColor(color);
+			node->setAngle(angle);
 		}
 		myfile.close();
 		std::cout << ">>>>> SCENE LOADED <<<<<" << std::endl;
@@ -452,6 +458,12 @@ void loadScene() {
 	}
 }
 
+void deleteSelected() {
+	if (SelectedNode != NULL) {
+		Scene->deleteNode(SelectedNode);
+		SelectedNode = NULL;
+	}
+}
 
 void cleanup()
 {
@@ -494,6 +506,7 @@ void timer(int value)
 void keyboard(unsigned char key, int x, int y) {
 
 	std::vector<Mesh*>::iterator it;
+	std::string fileName;
 
 	switch (key) {
 	case 'q':
@@ -517,11 +530,19 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'd':
 		Scene->deleteAllNodes();
 		break;
+	//backspace key has an ascii number
+	case 8:
+		deleteSelected();
+		break;
 	case 's':
-		saveScene();
+		std::cout << "Save scene - Please enter the file name: ";
+		std::cin >> fileName;
+		saveScene(fileName);
 		break;
 	case 'l':
-		loadScene();
+		std::cout << "Load scene - Please enter the file name: ";
+		std::cin >> fileName;
+		loadScene(fileName);
 		break;
 	case 'p':
 		if(SelectedNode != NULL){

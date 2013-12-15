@@ -9,8 +9,8 @@ out vec4 out_Color;
 
 uniform sampler2D texture_uniform;
 
-#define ONE 0.00390625
-#define ONEHALF 0.001953125
+#define ONE 1/100
+#define ONEHALF 0.5/100
 // The numbers above are 1/256 and 0.5/256, change accordingly
 // if you change the code to use another texture size.
 
@@ -72,6 +72,7 @@ float f1(vec2 p){
 	}
 	return a;
 }
+
 float f0(vec2 p){
 	vec2 p0=vec2(floor(p.x),floor(p.y));
 	vec2 p1=vec2(floor(p.x)+1.0,floor(p.y));
@@ -88,6 +89,7 @@ float f0(vec2 p){
 	float a2=a0*(1.0-s1)+a1*s1;
 	return a2;
 }
+
 void main(void) {
 	vec3 normal = normalize(n);
 	vec3 eye = vec3(0.0, 5.0, 5.0);
@@ -95,22 +97,20 @@ void main(void) {
 	vec4 diffuseLight = ex_Color;
 	vec4 ambientLight = vec4(0.1,0.1,0.1,1.0);
 	vec4 specularLight = vec4(0.5,0.5,0.5,1.0);
-	float shininess = 5.0; 
+	float shininess = 5.0;
+
 	vec3 L = normalize(lightSource - v);
-	//vec3 L = normalize(-lightSource);
-	//vec3 E = normalize(-v);
 	vec3 E = normalize(eye - v);
 	vec3 R = normalize(reflect(-L, normal));
+
 	vec4 Idiff = max(dot(normal, L), 0.0) * diffuseLight;
 	Idiff = clamp(Idiff, 0.0, 1.0);
+
 	vec4 Iamb = ambientLight;
+
 	vec4 Ispec = pow(max(dot(R, E), 0.0), 0.3 * shininess) * specularLight;
 	Ispec = clamp(Ispec, 0.0, 1.0);
-	float val = noise(ex_TexCoord);
-	//out_Color = texture2D(texture_uniform, ex_TexCoord*val) * (Idiff + Iamb + Ispec);
 	
-	//out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 2.0)) * (Idiff + Iamb + Ispec);
-	out_Color = (Idiff + Iamb + Ispec);
-	//float n1 = (cnoise(textureCoordinate * scale) + 1.0) / 2.0; 
+	out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 5.0)) * (Idiff + Iamb + Ispec);
 	
-	}
+}

@@ -26,7 +26,7 @@
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
-#define TEXTURE_PATH "../src/meshes/noiseTexture.png"
+#define TEXTURE_PATH "../src/meshes/basalt2rough.png"
 
 //int WinX = 640, WinY = 640;
 int WinX = 900, WinY = 640;
@@ -281,7 +281,7 @@ void createSidebar() {
 	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader);
 	prn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
 	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
-	prn->_angle = 60.0f;
+	prn->_angle = 45.0f;
 	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *hs = new Mesh();
@@ -308,7 +308,7 @@ void createSidebar() {
 	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader);
 	lprn->_position = glm::vec3(0.15f, 0.3f, 0.0f);
 	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
-	lprn->_angle = -170.0f;
+	lprn->_angle = 45.0f;
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cw = new Mesh();
@@ -383,7 +383,7 @@ void drawScene()
 	grid.drawGrid();
 	
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 0.0, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
 	glViewport(640, 0, 260, 640);
 	
@@ -633,6 +633,14 @@ void meshSelector(GLfloat data) {
 	switch (id) {
 	case 240:
 		std::cout << "Cube" << std::endl;
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+
+			SelectedNode = NULL;
+			canDrag=true;
+		}
 		createMesh(0);
 		SelectedNode = Scene->findNode(ID - 1);
 		if (SelectedNode != NULL) {
@@ -644,6 +652,14 @@ void meshSelector(GLfloat data) {
 		break;
 	case 241:
 		std::cout << "Prism" << std::endl;
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+
+			SelectedNode = NULL;
+			canDrag=true;
+		}
 		createMesh(2);
 		SelectedNode = Scene->findNode(ID - 1);
 		if (SelectedNode != NULL) {
@@ -655,6 +671,14 @@ void meshSelector(GLfloat data) {
 		break;
 	case 242:
 		std::cout << "Half cube" << std::endl;
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+
+			SelectedNode = NULL;
+			canDrag=true;
+		}
 		createMesh(1);
 		SelectedNode = Scene->findNode(ID - 1);
 		if (SelectedNode != NULL) {
@@ -666,6 +690,14 @@ void meshSelector(GLfloat data) {
 		break;
 	case 243:
 		std::cout << "Quarter cube" << std::endl;
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+
+			SelectedNode = NULL;
+			canDrag=true;
+		}
 		createMesh(4);
 		SelectedNode = Scene->findNode(ID - 1);
 		if (SelectedNode != NULL) {
@@ -677,6 +709,14 @@ void meshSelector(GLfloat data) {
 		break;
 	case 244:
 		std::cout << "Half prism" << std::endl;
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+
+			SelectedNode = NULL;
+			canDrag=true;
+		}
 		createMesh(3);
 		SelectedNode = Scene->findNode(ID - 1);
 		if (SelectedNode != NULL) {
@@ -688,13 +728,24 @@ void meshSelector(GLfloat data) {
 		break;
 	case 245:
 		std::cout << "White" << std::endl;
-		Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
-		changeSidebarMeshColor();
+
+		if (SelectedNode != NULL) {
+			SelectedNode->setColor(glm::vec4(0.9, 0.9, 0.9, 1.0));
+		} else {
+			Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
+			changeSidebarMeshColor();
+		}
+
 		break;
 	case 246:
 		std::cout << "Black" << std::endl;
-		Color = glm::vec4(0.1, 0.1, 0.1, 1.0);
-		changeSidebarMeshColor();
+
+		if (SelectedNode != NULL) {
+			SelectedNode->setColor(glm::vec4(0.1, 0.1, 0.1, 1.0));
+		} else {
+			Color = glm::vec4(0.1, 0.1, 0.1, 1.0);
+			changeSidebarMeshColor();
+		}
 		break;
 	}
 
@@ -726,19 +777,25 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				canDrag=true;
 			} else {
 				if (SelectedNode != NULL) {
-					glm::vec3 currentPosition = SelectedNode->_position;
-					currentPosition.y -= 0.25;
-					SelectedNode->setPosition(currentPosition);
+					if (data == SelectedNode->_id) {
+						glm::vec3 currentPosition = SelectedNode->_position;
+						currentPosition.y -= 0.25;
+						SelectedNode->setPosition(currentPosition);
+
+						SelectedNode = NULL;
+						canDrag=true;
+					}
+				} else {
+					SelectedNode = Scene->findNode(GLint(data));
+					if (SelectedNode != NULL) {
+						glm::vec3 currentPosition = SelectedNode->_position;
+						currentPosition.y += 0.25;
+						SelectedNode->setPosition(currentPosition);
+					}
 				}
 
-				SelectedNode = Scene->findNode(GLint(data));
-				if (SelectedNode != NULL) {
-					glm::vec3 currentPosition = SelectedNode->_position;
-					currentPosition.y += 0.25;
-					SelectedNode->setPosition(currentPosition);
-				} else {
-					meshSelector(data);
-				}
+
+				meshSelector(data);
 
 			}
 		}
@@ -763,6 +820,10 @@ void mouseMotion(int x, int y){
 	}
 }
 
+void wheel(int button, int dir, int x, int y) {
+	myCamera->zoom(dir);
+}
+
 /////////////////////////////////////////////////////////////////////// SETUP
 
 void setupCallbacks() 
@@ -777,6 +838,7 @@ void setupCallbacks()
 	glutSpecialFunc(keyboardSpecial);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseMotion);
+	//glutMouseWheelFunc(wheel);
 }
 
 void setupOpenGL() {

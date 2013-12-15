@@ -21,6 +21,7 @@ SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 	_id = node->_id;
 	_position = node->_position;
 	_mesh = new Mesh(node->_mesh);
+	_mesh->loadTextureFile(p->getProgramId());
 	_color = node->_color;
 	_angle = node->_angle;
 	_shader = p;

@@ -110,9 +110,11 @@ void Camera::lookAt(){
 
 void Camera::zoom(int dir){
 	if(dir<0){
-		eyeVector = eyeVector*1.01f;
+		//eyeVector = eyeVector*1.01f;
+		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, -1.0f, -1.0f));
 	}else{
-		eyeVector = eyeVector*0.99f;	
+		//eyeVector = eyeVector*0.99f;
+		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 1.0f, 1.0f));
 	}
 	updateVMatrixFlag=true;
 }

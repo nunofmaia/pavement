@@ -11,8 +11,9 @@ Mesh::Mesh(Mesh* m) {
 	vertices = m->vertices;
 	normals = m->normals;
 	textures = m->textures;
-	readUV=false;
-	hasTexture=false;
+	readUV = m->readUV;
+	hasTexture = m->hasTexture;
+	texturePath = m->texturePath;
 }
 
 

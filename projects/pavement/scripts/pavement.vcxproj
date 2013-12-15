@@ -27,7 +27,6 @@
     <None Include="..\src\shaders\ReflectionOShader.glsl" />
     <None Include="..\src\shaders\ReflectionZShader.glsl" />
     <None Include="..\src\shaders\SidebarFragmentShader.glsl" />
-    <None Include="..\src\shaders\SidebarVertexShader.glsl" />
     <None Include="..\src\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>

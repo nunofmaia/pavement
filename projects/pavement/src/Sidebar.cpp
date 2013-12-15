@@ -10,12 +10,12 @@ Sidebar::~Sidebar() {
 
 void Sidebar::createBufferObjects() {
 
-	_vertices.push_back(glm::vec4(-2.0, -2.0, -2.0, 1.0));
-	_vertices.push_back(glm::vec4(2.0, -2.0, -2.0, 1.0));
-	_vertices.push_back(glm::vec4(-2.0, 2.0, -2.0, 1.0));
-	_vertices.push_back(glm::vec4(-2.0, 2.0, -2.0, 1.0));
-	_vertices.push_back(glm::vec4(2.0, -2.0, -2.0, 1.0));
-	_vertices.push_back(glm::vec4(2.0, 2.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(-4.0, -4.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(4.0, -4.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(-4.0, 4.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(-4.0, 4.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(4.0, -4.0, -2.0, 1.0));
+	_vertices.push_back(glm::vec4(4.0, 4.0, -2.0, 1.0));
 
 	_colors.push_back(glm::vec4(0.5, 0.5, 0.5, 1.0));
 	_colors.push_back(glm::vec4(0.5, 0.5, 0.5, 1.0));

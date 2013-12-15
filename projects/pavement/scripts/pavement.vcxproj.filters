@@ -71,9 +71,6 @@
     <None Include="..\src\shaders\SidebarFragmentShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
-    <None Include="..\src\shaders\SidebarVertexShader.glsl">
-      <Filter>Shaders Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">

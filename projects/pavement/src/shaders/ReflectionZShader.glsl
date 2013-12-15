@@ -3,8 +3,10 @@
 in vec4 in_Position;
 in vec4 in_Color;
 in vec4 in_Normal;
+in vec2 in_TexCoord;
 
 out vec4 ex_Color;
+out vec2 ex_TexCoord;
 
 out vec3 v;
 out vec3 n;
@@ -49,5 +51,6 @@ void main(void)
 
 	gl_Position = ProjectionMatrix * ViewMatrix * MM * RM * Position;
 	ex_Color = DefaultColor;
+	ex_TexCoord = in_TexCoord;
 	
 }

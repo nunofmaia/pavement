@@ -62,7 +62,6 @@ void Mesh::parse(){
 				normals.push_back(normalIndices[n1-1]);
 				normals.push_back(normalIndices[n2-1]);
 				normals.push_back(normalIndices[n3-1]);
-				//std::cout<<"f1: "<<i1<<" n1: "<<n1<<std::endl;
 			}
 			else{
 				linestream>>v1;	linestream>>ignore; linestream>>t1; linestream>>ignore; linestream>>n1; 
@@ -95,7 +94,7 @@ void Mesh::loadMeshFile(std::string filePath,std::string texturePath = "" ){
 	}
 	meshString = Utils::readFile(filePath);
 	parse();
-	std::cerr<<"Mesh : "<<filePath<<std::endl<<" Vertices: "<<vertices.size()<<" Normals: "<<normals.size()<<" UV: "<<textures.size()<<" Vertex Indices: "<< vertexIndices.size()<<" normal Indices: "<< normalIndices.size()<<" Texture Indices: "<< textureIndices.size()<<std::endl<<std::endl;
+	//std::cerr<<"Mesh : "<<filePath<<std::endl<<" Vertices: "<<vertices.size()<<" Normals: "<<normals.size()<<" UV: "<<textures.size()<<" Vertex Indices: "<< vertexIndices.size()<<" normal Indices: "<< normalIndices.size()<<" Texture Indices: "<< textureIndices.size()<<std::endl<<std::endl;
 }
 
 void Mesh::printMesh(){
@@ -170,7 +169,7 @@ void Mesh::loadTextureFile(GLuint pId){
 
 		int width,height;
 		unsigned char* img = SOIL_load_image(texturePath.c_str(), &width, &height, NULL, SOIL_LOAD_RGB);
-		std::cout<<"Texture imported:"<<"Width: "<<width<<" Height: "<<height<<std::endl;
+		//std::cout<<"Texture imported:"<<"Width: "<<width<<" Height: "<<height<<std::endl;
 
 		glGenTextures(1, &textureId);
 		glBindTexture(GL_TEXTURE_2D, textureId);

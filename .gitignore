@@ -1,7 +1,9 @@
 projects/pavement/obj/
 *.sdf
+*.opensdf
 *.suo
 *.exe
 *.ilk
 *.pdb
 Thumbs.db
+*.txt

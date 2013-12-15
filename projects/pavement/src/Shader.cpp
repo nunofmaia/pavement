@@ -30,7 +30,6 @@ bool ShaderProgram::checkShaderCompilation(GLuint id, std::string name){
 	}
 	else
 	{
-		std::cerr<<"Shader "<<id<<" compiled!"<<std::endl;
 		return true;
 	}
 }

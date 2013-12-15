@@ -5,11 +5,12 @@ SceneNode::SceneNode() {
 	_shader = NULL;
 }
 
-SceneNode::SceneNode(int id, Mesh* mesh, ShaderProgram* shader) {
+SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 	_mesh = mesh;
 	_mesh->loadTextureFile(shader->getProgramId());
 	_shader = shader;
 	_id = id;
+	_shape = shape;
 	_canDraw = true;
 	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
 	_angle = 0.0f;

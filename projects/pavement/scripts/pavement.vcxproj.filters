@@ -94,11 +94,10 @@
     <ClInclude Include="..\src\SceneGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="..\src\Sidebar.h">
-=======
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\IDrawable.h">
->>>>>>> d3b5a25c8fd817fae10c0c31e68964a4a9aeb944
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

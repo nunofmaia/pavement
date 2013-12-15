@@ -1,3 +1,6 @@
+#ifndef SCENE_GRAPH_H
+#define SCENE_GRAPH_H
+
 #include <vector>
 
 #include "Mesh.h"
@@ -9,13 +12,14 @@ struct SceneNode {
 	Mesh* _mesh;
 	ShaderProgram* _shader;
 	int _id;
+	int _shape;
 	glm::vec3 _position;
 	glm::vec4 _color;
 	GLfloat _angle;
 	bool _canDraw;
 
 	SceneNode();
-	SceneNode(int, Mesh*, ShaderProgram*);
+	SceneNode(int, int, Mesh*, ShaderProgram*);
 	SceneNode(SceneNode*, ShaderProgram*);
 	~SceneNode();
 	void setColor(glm::vec4);
@@ -29,9 +33,8 @@ struct SceneNode {
 };
 
 struct SceneGraph {
-private:
 	std::vector<SceneNode*> _nodes;
-public:
+
 	SceneGraph();
 	~SceneGraph();
 	void draw();
@@ -41,3 +44,5 @@ public:
 	void deleteAllNodes();
 	SceneNode* findNode(int);
 };
+
+#endif

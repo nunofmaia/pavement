@@ -67,9 +67,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,6 +83,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SceneGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IDrawable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,11 +9,11 @@
 #include <vector>
 #include <string>
 #include <sstream> 
-#include "Engine.h"
-#include "soil\src\SOIL.h"
 
-class Mesh
-{
+#include "soil\src\SOIL.h"
+#include "Engine.h"
+
+class Mesh {
 public:
 	
 	std::vector< glm::vec4 > vertices;
@@ -30,7 +30,7 @@ public:
 	void loadMeshFile(std::string filePath, std::string texturePath);
 	void printMesh();
 	void createBufferObjects();
-	void draw();
+	virtual void draw();
 
 	std::vector< glm::vec4 >*getVertices();
 	void reverseElements();

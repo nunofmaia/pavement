@@ -5,9 +5,12 @@
 ///////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
+#include <cstring>
+#include <cstdlib>
 
 #include "Engine.h"
 #include "Shader.h"
@@ -20,8 +23,8 @@
 
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
-
-
+#define MESH_PATH "../src/meshes/"
+#define TEXTURE_PATH "../src/meshes/noiseTexture.png"
 
 int WinX = 640, WinY = 640;
 int Win2X = 640, Win2Y = 640;
@@ -44,11 +47,13 @@ SceneGraph *Scene = new SceneGraph();
 Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 Grid grid(20);
 
+
 int ID = 1;
 int lastMx = 0, lastMy = 0;
 SceneNode* SelectedNode;
 
-std::map<ShaderProgram*, std::vector<Mesh*>*> MeshManager;
+std::map<int, std::string> Shapes;
+
 enum SymmetryMode {
 	NONE,
 	XAXIS,
@@ -58,6 +63,15 @@ enum SymmetryMode {
 };
 
 int SymMode = SymmetryMode::NONE;
+
+
+void initializeShapes() {
+	Shapes[0] = "cube";
+	Shapes[1] = "halfCube";
+	Shapes[2] = "prism";
+	Shapes[3] = "halfPrism";
+	Shapes[4] = "quarterCube";
+}
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -83,13 +97,14 @@ void checkOpenGLError(std::string error)
 
 /////////////////////////////////////////////////////////////////////// SHADERs
 
-void createMesh(std::string filePath, std::string texturePath = ""){
+//this should be renamed to addNode
+SceneNode* createMesh(int shape) {
 
 	// Original solid
 	Mesh* m = new Mesh();
-	m->loadMeshFile(filePath,texturePath);
+	m->loadMeshFile(MESH_PATH + Shapes[shape] + ".obj", TEXTURE_PATH);
 	m->createBufferObjects();
-	SceneNode* n = new SceneNode(ID++, m, Shader);
+	SceneNode* n = new SceneNode(ID++, shape, m, Shader);
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
@@ -132,7 +147,8 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 		nZ->_canDraw = false;
 		break;
 	}
-	
+
+	return n;
 }
 
 
@@ -151,8 +167,6 @@ void createShaderProgram()
 	UboId = glGetUniformBlockIndex(Shader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(Shader->getProgramId(), UboId, UBO_BP);
 
-	MeshManager[Shader] = new std::vector<Mesh*>();
-
 	ReflectionX = new ShaderProgram();
 
 	ReflectionX->setProgramId();
@@ -165,8 +179,6 @@ void createShaderProgram()
 
 	UboId = glGetUniformBlockIndex(ReflectionX->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(ReflectionX->getProgramId(), UboId, UBO_BP);
-
-	MeshManager[ReflectionX] = new std::vector<Mesh*>();
 
 	ReflectionZ = new ShaderProgram();
 
@@ -181,8 +193,6 @@ void createShaderProgram()
 	UboId = glGetUniformBlockIndex(ReflectionZ->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(ReflectionZ->getProgramId(), UboId, UBO_BP);
 
-	MeshManager[ReflectionZ] = new std::vector<Mesh*>();
-
 	ReflectionO = new ShaderProgram();
 
 	ReflectionO->setProgramId();
@@ -195,8 +205,6 @@ void createShaderProgram()
 
 	UboId = glGetUniformBlockIndex(ReflectionO->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(ReflectionO->getProgramId(), UboId, UBO_BP);
-
-	MeshManager[ReflectionO] = new std::vector<Mesh*>();
 
 	GridShader = new ShaderProgram();
 
@@ -280,6 +288,53 @@ void drawScene()
 
 /////////////////////////////////////////////////////////////////////// CALLBACKS
 
+
+void saveScene() {
+	std::ofstream myfile;
+	myfile.open ("scene.txt");
+	std::vector<SceneNode*>::iterator it;
+	for (it = Scene->_nodes.begin(); it != Scene->_nodes.end(); ++it) {
+		myfile << (*it)->_shape
+			<< " " << (*it)->_position.x
+			<< " " << (*it)->_position.y
+			<< " " << (*it)->_position.z
+			<< " " << (*it)->_color.r
+			<< " " << (*it)->_color.g
+			<< " " << (*it)->_color.b
+			<< " " << (*it)->_color.a
+			<< " " << (*it)->_angle << "\n";
+	}
+	myfile.close();
+}
+
+void loadScene() {
+	std::ifstream myfile("scene.txt");
+	std::string line;
+	std::vector<float> fields;
+
+	if (myfile.is_open()) {
+		ID = 1;
+		Scene->deleteAllNodes();
+		while (getline(myfile, line)) {
+			char* next = NULL;
+			char* temp = strtok_s((char*)line.c_str(), " ", &next);
+			while (temp != NULL) {
+				fields.push_back((float)atof(temp));
+				temp = strtok_s(NULL, " ", &next);
+			}
+			SceneNode* node = createMesh((int)fields[0]);
+			node->_position = glm::vec3(fields[1], fields[2], fields[3]);
+			node->_color = glm::vec4(fields[4], fields[5], fields[6], fields[7]);
+			node->_angle = fields[8];
+			fields.clear();
+		}
+		myfile.close();
+	} else {
+		std::cout << "Unable to open file";
+	}
+}
+
+
 void cleanup()
 {
 	destroyShaderProgram();
@@ -327,25 +382,28 @@ void keyboard(unsigned char key, int x, int y) {
 		glutDestroyWindow(WindowHandle);
 		break;
 	case 'c':
-		createMesh("../src/meshes/cube.obj");
+		createMesh(0);
 		break;
 	case 'v':
-		createMesh("../src/meshes/halfCube.obj");
+		createMesh(1);
 		break;
 	case 'b':
-		createMesh("../src/meshes/prism.obj");
+		createMesh(2);
 		break;
 	case 'n':
-		createMesh("../src/meshes/halfPrism.obj");
+		createMesh(3);
 		break;
 	case 'm':
-		createMesh("../src/meshes/quarterCube.obj");
-		break;
-	case 'l':
-		createMesh("../src/meshes/cubeTest.obj", "../src/meshes/noiseTexture.png");
+		createMesh(4);
 		break;
 	case 'd':
 		Scene->deleteAllNodes();
+		break;
+	case 's':
+		saveScene();
+		break;
+	case 'l':
+		loadScene();
 		break;
 	case 'p':
 		if(SelectedNode != NULL){
@@ -363,10 +421,6 @@ void keyboard(unsigned char key, int x, int y) {
 			SelectedNode->setAngle(newAngle);
 		}
 		break;
-	/*case 'l':
-		std::cout<<"restart"<<std::endl;
-		myCamera->restartCamera();
-		break;*/
 	case '0':
 		SymMode = SymmetryMode::NONE;
 		Scene->hideSolids(ReflectionX);
@@ -564,11 +618,10 @@ void init(int argc, char* argv[])
 	setupGLUT(argc, argv);
 	setupGLEW();
 	setupOpenGL();
+	initializeShapes();
 	createShaderProgram();
 	createBufferObjects();
 	setupCallbacks();
-	//float lol = cnoise(glm::vec2(1,2));
-	//std::cout<<"lol "<<lol<<std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -579,3 +632,5 @@ int main(int argc, char* argv[])
 }
 
 ///////////////////////////////////////////////////////////////////////
+
+

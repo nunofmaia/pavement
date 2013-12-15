@@ -12,6 +12,7 @@ struct SceneNode {
 	glm::vec3 _position;
 	glm::vec4 _color;
 	GLfloat _angle;
+	glm::vec3 _scale;
 	bool _canDraw;
 
 	SceneNode();
@@ -29,7 +30,7 @@ struct SceneNode {
 };
 
 struct SceneGraph {
-private:
+//private:
 	std::vector<SceneNode*> _nodes;
 public:
 	SceneGraph();

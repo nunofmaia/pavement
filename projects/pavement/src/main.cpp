@@ -16,6 +16,8 @@
 #include "Camera.h"
 #include "SceneGraph.h"
 
+#include "Sidebar.h"
+
 #define CAPTION "Tangram"
 
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
@@ -23,8 +25,8 @@
 
 
 
-int WinX = 640, WinY = 640;
-int Win2X = 640, Win2Y = 640;
+//int WinX = 640, WinY = 640;
+int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
 bool canDrag=false;
@@ -38,11 +40,13 @@ ShaderProgram *ReflectionX;
 ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
 ShaderProgram *GridShader;
+ShaderProgram *SidebarShader;
 
 SceneGraph *Scene = new SceneGraph();
 
 Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 Grid grid(20);
+Sidebar sb;
 
 int ID = 1;
 int lastMx = 0, lastMy = 0;
@@ -87,7 +91,7 @@ void createMesh(std::string filePath, std::string texturePath = ""){
 
 	// Original solid
 	Mesh* m = new Mesh();
-	m->loadMeshFile(filePath,texturePath);
+	m->loadMeshFile(filePath, texturePath);
 	m->createBufferObjects();
 	SceneNode* n = new SceneNode(ID++, m, Shader);
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
@@ -160,6 +164,7 @@ void createShaderProgram()
 	ReflectionX->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
 	ReflectionX->bindAttribLocation(VERTICES, "in_Position");
 	ReflectionX->bindAttribLocation(COLORS, "in_Color");
+	ReflectionX->bindAttribLocation(TEXTURES, "in_Texcoord");
 	ReflectionX->bindAttribLocation(NORMALS, "in_Normal");
 	ReflectionX->linkShaderProgram();
 
@@ -175,6 +180,7 @@ void createShaderProgram()
 	ReflectionZ->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
 	ReflectionZ->bindAttribLocation(VERTICES, "in_Position");
 	ReflectionZ->bindAttribLocation(COLORS, "in_Color");
+	ReflectionZ->bindAttribLocation(TEXTURES, "in_Texcoord");
 	ReflectionZ->bindAttribLocation(NORMALS, "in_Normal");
 	ReflectionZ->linkShaderProgram();
 
@@ -190,6 +196,7 @@ void createShaderProgram()
 	ReflectionO->addShaderFromFile(FRAGMENT_SHADER_FILE, GL_FRAGMENT_SHADER);
 	ReflectionO->bindAttribLocation(VERTICES, "in_Position");
 	ReflectionO->bindAttribLocation(COLORS, "in_Color");
+	ReflectionO->bindAttribLocation(TEXTURES, "in_Texcoord");
 	ReflectionO->bindAttribLocation(NORMALS, "in_Normal");
 	ReflectionO->linkShaderProgram();
 
@@ -204,12 +211,25 @@ void createShaderProgram()
 	GridShader->addShaderFromFile("../src/shaders/GridVertexShader.glsl", GL_VERTEX_SHADER);
 	GridShader->addShaderFromFile("../src/shaders/GridFragmentShader.glsl", GL_FRAGMENT_SHADER);
 	GridShader->bindAttribLocation(VERTICES, "in_Position");
-	ReflectionX->bindAttribLocation(COLORS, "in_Color");
-	ReflectionX->bindAttribLocation(NORMALS, "in_Normal");
+	GridShader->bindAttribLocation(COLORS, "in_Color");
+	GridShader->bindAttribLocation(NORMALS, "in_Normal");
 	GridShader->linkShaderProgram();
 
 	UboId = glGetUniformBlockIndex(GridShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(GridShader->getProgramId(), UboId, UBO_BP);
+
+	SidebarShader = new ShaderProgram();
+
+	SidebarShader->setProgramId();
+	SidebarShader->addShaderFromFile("../src/shaders/VertexShader.glsl", GL_VERTEX_SHADER);
+	SidebarShader->addShaderFromFile("../src/shaders/SidebarFragmentShader.glsl", GL_FRAGMENT_SHADER);
+	SidebarShader->bindAttribLocation(VERTICES, "in_Position");
+	SidebarShader->bindAttribLocation(COLORS, "in_Color");
+	SidebarShader->bindAttribLocation(NORMALS, "in_Normal");
+	SidebarShader->linkShaderProgram();
+
+	UboId = glGetUniformBlockIndex(SidebarShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(SidebarShader->getProgramId(), UboId, UBO_BP);
 	
 	checkOpenGLError("ERROR: Could not create shaders.");
 }
@@ -231,10 +251,89 @@ void destroyShaderProgram()
 
 typedef GLfloat Matrix[16];
 
-void createBufferObjects(){
+SceneGraph *sidebar = new SceneGraph();
+SceneNode *white;
+SceneNode *black;
+
+void createSidebar() {
+	int id = 240;
+
+	Mesh *sq = new Mesh();
+	sq->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	sq->createBufferObjects();
+	SceneNode *sqn = new SceneNode(id++, sq, SidebarShader);
+	sqn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
+	sqn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	sqn->_angle = 45.0f;
+	sqn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *pr = new Mesh();
+	pr->loadMeshFile("../src/meshes/sidebar/prism.obj", "");
+	pr->createBufferObjects();
+	SceneNode *prn = new SceneNode(id++, pr, SidebarShader);
+	prn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
+	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	prn->_angle = 60.0f;
+	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *hs = new Mesh();
+	hs->loadMeshFile("../src/meshes/sidebar/halfCube.obj", "");
+	hs->createBufferObjects();
+	SceneNode *hsn = new SceneNode(id++, hs, SidebarShader);
+	hsn->_position = glm::vec3(-0.15f, 0.3f, 0.0f);
+	hsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	hsn->_angle = 45.0f;
+	hsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *qs = new Mesh();
+	qs->loadMeshFile("../src/meshes/sidebar/quarterCube.obj", "");
+	qs->createBufferObjects();
+	SceneNode *qsn = new SceneNode(id++, qs, SidebarShader);
+	qsn->_position = glm::vec3(-0.15f, 0.0f, 0.0f);
+	qsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	qsn->_angle = 45.0f;
+	qsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *lpr = new Mesh();
+	lpr->loadMeshFile("../src/meshes/sidebar/halfPrism.obj", "");
+	lpr->createBufferObjects();
+	SceneNode *lprn = new SceneNode(id++, lpr, SidebarShader);
+	lprn->_position = glm::vec3(0.15f, 0.3f, 0.0f);
+	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	lprn->_angle = -170.0f;
+	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *cw = new Mesh();
+	cw->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	cw->createBufferObjects();
+	white = new SceneNode(id++, sq, SidebarShader);
+	white->_position = glm::vec3(-0.10f, -0.3f, 0.0f);
+	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	Mesh *cb = new Mesh();
+	cb->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	cb->createBufferObjects();
+	black = new SceneNode(id++, sq, SidebarShader);
+	black->_position = glm::vec3(0.10f, -0.3f, 0.0f);
+	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	sidebar->addNode(sqn);
+	sidebar->addNode(prn);
+	sidebar->addNode(hsn);
+	sidebar->addNode(qsn);
+	sidebar->addNode(lprn);
+	//sidebar->addNode(cwn);
+	//sidebar->addNode(cbn);
+}
+
+void createBufferObjects() {
 	glGenBuffers(1, VboId);
 
 	grid.createBufferObjects();
+	sb.createBufferObjects();
+
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, 0, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, UBO_BP, VboId[0]);
@@ -265,7 +364,8 @@ void drawScene()
 	myCamera->lookAt();
 	myCamera->viewMode();
 	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glViewport(0, 0, 640, 640);
 
 	Scene->draw();
 
@@ -273,10 +373,24 @@ void drawScene()
 
 	GridShader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	grid.drawGrid();
+	
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 0.0, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
+	glViewport(640, 0, 260, 640);
+	
+	sb.draw();
 
+	sidebar->draw();
+
+	white->draw();
+	black->draw();
+
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glUseProgram(0); //TODO: Use ShaderProgram
 	checkOpenGLError("ERROR: Could not draw scene.");
 }
+
 
 /////////////////////////////////////////////////////////////////////// CALLBACKS
 
@@ -444,6 +558,91 @@ void keyboardSpecial(int key, int x, int y) {
 int MouseX = 0;
 int MouseY = 0;
 
+glm::vec4 Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
+
+void changeSidebarMeshColor() {
+	std::vector<SceneNode*> nodes = sidebar->_nodes;
+	std::vector<SceneNode*>::iterator it;
+	for (it = nodes.begin(); it != nodes.end(); it++) {
+		(*it)->setColor(Color);
+	}
+}
+
+
+void meshSelector(GLfloat data) {
+	GLuint id = GLuint(data);
+
+	switch (id) {
+	case 240:
+		std::cout << "Cube" << std::endl;
+		createMesh("../src/meshes/cube.obj");
+		SelectedNode = Scene->findNode(ID - 1);
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			SelectedNode->setColor(Color);
+		}
+		break;
+	case 241:
+		std::cout << "Prism" << std::endl;
+		createMesh("../src/meshes/prism.obj");
+		SelectedNode = Scene->findNode(ID - 1);
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			SelectedNode->setColor(Color);
+		}
+		break;
+	case 242:
+		std::cout << "Half cube" << std::endl;
+		createMesh("../src/meshes/halfCube.obj");
+		SelectedNode = Scene->findNode(ID - 1);
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			SelectedNode->setColor(Color);
+		}
+		break;
+	case 243:
+		std::cout << "Quarter cube" << std::endl;
+		createMesh("../src/meshes/quarterCube.obj");
+		SelectedNode = Scene->findNode(ID - 1);
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			SelectedNode->setColor(Color);
+		}
+		break;
+	case 244:
+		std::cout << "Half prism" << std::endl;
+		createMesh("../src/meshes/halfPrism.obj");
+		SelectedNode = Scene->findNode(ID - 1);
+		if (SelectedNode != NULL) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.y += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			SelectedNode->setColor(Color);
+		}
+		break;
+	case 245:
+		std::cout << "White" << std::endl;
+		Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
+		changeSidebarMeshColor();
+		break;
+	case 246:
+		std::cout << "Black" << std::endl;
+		Color = glm::vec4(0.1, 0.1, 0.1, 1.0);
+		changeSidebarMeshColor();
+		break;
+	}
+
+}
+
+
 void mouse(GLint button, GLint state, GLint x, GLint y) {
 
 	switch (button) {
@@ -475,9 +674,14 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				}
 
 				SelectedNode = Scene->findNode(GLint(data));
-				glm::vec3 currentPosition = SelectedNode->_position;
-				currentPosition.y += 0.25;
-				SelectedNode->setPosition(currentPosition);
+				if (SelectedNode != NULL) {
+					glm::vec3 currentPosition = SelectedNode->_position;
+					currentPosition.y += 0.25;
+					SelectedNode->setPosition(currentPosition);
+				} else {
+					meshSelector(data);
+				}
+
 			}
 		}
 		if(state==GLUT_UP){
@@ -569,6 +773,8 @@ void init(int argc, char* argv[])
 	setupCallbacks();
 	//float lol = cnoise(glm::vec2(1,2));
 	//std::cout<<"lol "<<lol<<std::endl;
+
+	createSidebar();
 }
 
 int main(int argc, char* argv[])

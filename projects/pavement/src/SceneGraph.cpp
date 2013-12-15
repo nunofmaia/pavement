@@ -13,6 +13,7 @@ SceneNode::SceneNode(int id, Mesh* mesh, ShaderProgram* shader) {
 	_canDraw = true;
 	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
 	_angle = 0.0f;
+	_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
@@ -22,6 +23,7 @@ SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 	_color = node->_color;
 	_angle = node->_angle;
 	_shader = p;
+	_scale = node->_scale;
 }
 
 
@@ -60,7 +62,7 @@ void SceneNode::draw() {
 	if(_canDraw) {
 		if (_shader != NULL) {
 			_shader->useShaderProgram();
-			_shader->setUniform("ModelMatrix", glm::translate(glm::mat4(1.0), _position));
+			_shader->setUniform("ModelMatrix", glm::scale(glm::translate(glm::mat4(1.0), _position), _scale));
 			_shader->setUniform("DefaultColor", _color);
 			_shader->setUniform("Angle", _angle);
 		}

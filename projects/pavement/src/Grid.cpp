@@ -46,7 +46,7 @@ void Grid::generateGrid(){
 
 
 	for(int i=0; i<(int)lines.size();i++){
-		line_colors.push_back(glm::vec4(0.2, 0.2, 0.2, 1.0));
+		line_colors.push_back(glm::vec4(0.5, 0.5, 0.5, 1.0));
 	}
 	std::cout<<lines.size()<<" "<<line_colors.size()<<std::endl;
 }
@@ -54,34 +54,34 @@ void Grid::generateGrid(){
 void Grid::highlightGrid(int n){
 	switch(n){
 	case 0:
-		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
 		break;
 	case 1:
-		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
-		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
-		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		line_colors[0] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[1] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
 		break;
 	case 2:
-		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
-		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		line_colors[2] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[3] = glm::vec4(0.7, 0.7, 0.1, 1.0);
 		break;
 	case 3:
-		line_colors[0] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[1] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[2] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		line_colors[3] = glm::vec4(0.2, 0.2, 0.2, 1.0);
-		break;
-	case 4:
 		line_colors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
 		line_colors[1] = glm::vec4(0.5, 0.5, 0.5, 1.0);
 		line_colors[2] = glm::vec4(0.5, 0.5, 0.5, 1.0);
 		line_colors[3] = glm::vec4(0.5, 0.5, 0.5, 1.0);
+		break;
+	case 4:
+		line_colors[0] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[1] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[2] = glm::vec4(0.7, 0.7, 0.1, 1.0);
+		line_colors[3] = glm::vec4(0.7, 0.7, 0.1, 1.0);
 		break;
 	
 	}

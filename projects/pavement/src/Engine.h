@@ -10,7 +10,7 @@
 
 //#include "Shader.h"
 //#include "Utils.h"
-//#include "Mesh.h"
+#include "Mesh.h"
 
 const float qThreshold = (float)1.0e-5;
 const float vThreshold = (float)1.0e-5;

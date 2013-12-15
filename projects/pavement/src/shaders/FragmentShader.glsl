@@ -109,7 +109,8 @@ void main(void) {
 	float val = noise(ex_TexCoord);
 	//out_Color = texture2D(texture_uniform, ex_TexCoord*val) * (Idiff + Iamb + Ispec);
 	
-	out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 2.0)) * (Idiff + Iamb + Ispec);
+	//out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 2.0)) * (Idiff + Iamb + Ispec);
+	out_Color = (Idiff + Iamb + Ispec);
 	//float n1 = (cnoise(textureCoordinate * scale) + 1.0) / 2.0; 
 	
 	}

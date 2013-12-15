@@ -293,6 +293,7 @@ void saveScene() {
 	std::ofstream myfile;
 	myfile.open ("scene.txt");
 	std::vector<SceneNode*>::iterator it;
+
 	for (it = Scene->_nodes.begin(); it != Scene->_nodes.end(); ++it) {
 		myfile << (*it)->_shape
 			<< " " << (*it)->_position.x
@@ -305,9 +306,11 @@ void saveScene() {
 			<< " " << (*it)->_angle << "\n";
 	}
 	myfile.close();
+	std::cout << ">>>>> SCENE SAVED <<<<<" << std::endl;
 }
 
 void loadScene() {
+	std::cout << "<<<<< LOADING >>>>>" << std::endl;
 	std::ifstream myfile("scene.txt");
 	std::string line;
 	std::vector<float> fields;
@@ -323,12 +326,13 @@ void loadScene() {
 				temp = strtok_s(NULL, " ", &next);
 			}
 			SceneNode* node = createMesh((int)fields[0]);
-			node->_position = glm::vec3(fields[1], fields[2], fields[3]);
-			node->_color = glm::vec4(fields[4], fields[5], fields[6], fields[7]);
-			node->_angle = fields[8];
+			node->setPosition(glm::vec3(fields[1], fields[2], fields[3]));
+			node->setColor(glm::vec4(fields[4], fields[5], fields[6], fields[7]));
+			node->setAngle(fields[8]);
 			fields.clear();
 		}
 		myfile.close();
+		std::cout << ">>>>> SCENE LOADED <<<<<" << std::endl;
 	} else {
 		std::cout << "Unable to open file";
 	}

@@ -22,6 +22,7 @@ public:
 	bool updateVMatrixFlag;
 	bool restartViewMatrixFlag;
 	int switchMode;
+	GLfloat zoomFactor;
 
 	Camera(void);
 	Camera(glm::vec3,glm::vec3,glm::vec3);

@@ -39,7 +39,7 @@ float f0(vec2 p){
 void main(void) {
 	vec3 normal = normalize(n);
 	vec3 eye = vec3(0.0, 0.0, 5.0);
-	vec3 lightSource = vec3(-1.0, 4.0,5.0);
+	vec3 lightSource = vec3(-1.0, 4.0,1.0);
 	vec4 diffuseLight = ex_Color;
 	vec4 ambientLight = vec4(0.1,0.1,0.1,1.0);
 	vec4 specularLight = vec4(0.1, 0.1, 0.1,1.0);
@@ -56,8 +56,8 @@ void main(void) {
 	vec4 Ispec = pow(max(dot(R, E), 0.0), 0.3 * shininess) * specularLight;
 	Ispec = clamp(Ispec, 0.0, 1.0);
 	
-	//out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 2.0)) * (Idiff + Iamb + Ispec);
-	out_Color = (Idiff + Iamb + Ispec);
+	out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 10.0)) * (Idiff + Iamb + Ispec);
+	//out_Color = (Idiff + Iamb + Ispec);
 	//out_Color = ex_Color;
 	
 }

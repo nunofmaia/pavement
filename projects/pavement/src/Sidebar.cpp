@@ -45,11 +45,23 @@ void Sidebar::createBufferObjects() {
 	glDisableVertexAttribArray(VERTICES);
 }
 
+void Sidebar::addNode(SceneNode* n) {
+	_scene.addNode(n);
+}
+
+SceneGraph Sidebar::getScene() {
+	return _scene;
+}
+
+
+
 
 void Sidebar::draw() {
 	glBindVertexArray(VaoId);
 	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 	glBindVertexArray(0);
+
+	_scene.draw();
 }
 
 

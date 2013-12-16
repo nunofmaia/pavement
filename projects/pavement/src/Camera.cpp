@@ -7,6 +7,7 @@ Camera::Camera(void)
 {
 	rotationAngleX=0.0f;
 	rotationAngleY=0.0f;
+	zoomFactor = 1.0f;
 }
 
 Camera::Camera(glm::vec3 e, glm::vec3 c, glm::vec3 u){
@@ -24,6 +25,7 @@ Camera::Camera(glm::vec3 e, glm::vec3 c, glm::vec3 u){
 	mainViewMatrix = viewMatrix;
 	k=0.0f;
 	glm::quat mainQ = glm::angleAxis(rotationAngleY,yAxis)*glm::angleAxis(rotationAngleX,xAxis);
+	zoomFactor = 1.0f;
 }
 
 Camera::~Camera(void)
@@ -111,10 +113,10 @@ void Camera::lookAt(){
 void Camera::zoom(int dir){
 	if(dir<0){
 		//eyeVector = eyeVector*1.01f;
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, -1.0f, -1.0f));
+		zoomFactor *= 1.02f;
 	}else{
 		//eyeVector = eyeVector*0.99f;
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 1.0f, 1.0f));
+		zoomFactor *= 0.98f;
 	}
 	updateVMatrixFlag=true;
 }
@@ -141,7 +143,7 @@ void Camera::perspective(GLfloat fovy, GLfloat aspect, GLfloat n, GLfloat f){
 
 void Camera::viewMode(){
 	//if(switchMode == 0){
-	perspective(30.0f,(GLfloat)(windowX/windowY),2.0f,20.0f);			//perspective(GLfloat fovy, GLfloat aspect, GLfloat n, GLfloat f)
+	perspective(30.0f * zoomFactor,(GLfloat)(windowX/windowY),2.0f,20.0f);			//perspective(GLfloat fovy, GLfloat aspect, GLfloat n, GLfloat f)
 	//}
 	//else{
 	//	orthographic(-2.0f,2.0f,-2.0f,2.0f,1.0f,10.0f);						//orthogonalGLfloat l, GLfloat r,GLfloat b, GLfloat t, GLfloat n, GLfloat f)

@@ -234,6 +234,7 @@ void createShaderProgram()
 	SidebarShader->bindAttribLocation(VERTICES, "in_Position");
 	SidebarShader->bindAttribLocation(COLORS, "in_Color");
 	SidebarShader->bindAttribLocation(NORMALS, "in_Normal");
+	ReflectionO->bindAttribLocation(TEXTURES, "in_Texcoord");
 	SidebarShader->linkShaderProgram();
 
 	UboId = glGetUniformBlockIndex(SidebarShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
@@ -259,7 +260,6 @@ void destroyShaderProgram()
 
 typedef GLfloat Matrix[16];
 
-SceneGraph *sidebar = new SceneGraph();
 SceneNode *white;
 SceneNode *black;
 
@@ -267,7 +267,7 @@ void createSidebar() {
 	int id = 240;
 
 	Mesh *sq = new Mesh();
-	sq->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	sq->loadMeshFile("../src/meshes/sidebar/cube.obj", TEXTURE_PATH);
 	sq->createBufferObjects();
 	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader);
 	sqn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
@@ -327,13 +327,11 @@ void createSidebar() {
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	sidebar->addNode(sqn);
-	sidebar->addNode(prn);
-	sidebar->addNode(hsn);
-	sidebar->addNode(qsn);
-	sidebar->addNode(lprn);
-	//sidebar->addNode(cwn);
-	//sidebar->addNode(cbn);
+	sb.addNode(sqn);
+	sb.addNode(prn);
+	sb.addNode(hsn);
+	sb.addNode(qsn);
+	sb.addNode(lprn);
 }
 
 void createBufferObjects() {
@@ -388,8 +386,6 @@ void drawScene()
 	glViewport(640, 0, 260, 640);
 	
 	sb.draw();
-
-	sidebar->draw();
 
 	white->draw();
 	black->draw();
@@ -640,7 +636,7 @@ int MouseY = 0;
 glm::vec4 Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
 
 void changeSidebarMeshColor() {
-	std::vector<SceneNode*> nodes = sidebar->_nodes;
+	std::vector<SceneNode*> nodes = sb.getScene()._nodes;
 	std::vector<SceneNode*>::iterator it;
 	for (it = nodes.begin(); it != nodes.end(); it++) {
 		(*it)->setColor(Color);
@@ -859,7 +855,7 @@ void setupCallbacks()
 	glutSpecialFunc(keyboardSpecial);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseMotion);
-	//glutMouseWheelFunc(wheel);
+	glutMouseWheelFunc(wheel);
 }
 
 void setupOpenGL() {

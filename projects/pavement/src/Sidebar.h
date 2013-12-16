@@ -8,7 +8,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "Engine.h"
+#include "Mesh.h"
+#include "SceneGraph.h"
 
 class Sidebar {
 
@@ -17,6 +18,8 @@ class Sidebar {
 
 	std::vector<glm::vec4> _vertices;
 	std::vector<glm::vec4> _colors;
+
+	SceneGraph _scene;
 
 	
 
@@ -27,6 +30,8 @@ public:
 
 	void createBufferObjects();
 	void draw();
+	void addNode(SceneNode*);
+	SceneGraph getScene();
 };
 
 

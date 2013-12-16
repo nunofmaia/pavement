@@ -34,7 +34,7 @@ int WindowHandle = 0;
 unsigned int FrameCount = 0;
 bool canDrag=false;
 
-GLuint VaoId, VboId[4];
+GLuint VaoId, VboId[4], TextureId;
 GLint UboId, UniformId;
 const GLuint UBO_BP = 0;
 
@@ -105,10 +105,9 @@ void checkOpenGLError(std::string error)
 SceneNode* createMesh(int shape) {
 
 	// Original solid
-	Mesh* m = new Mesh();
-	m->loadMeshFile(MESH_PATH + Shapes[shape] + ".obj", TEXTURE_PATH);
+	Mesh* m = new Mesh(MESH_PATH + Shapes[shape] + ".obj");
 	m->createBufferObjects();
-	SceneNode* n = new SceneNode(ID++, shape, m, Shader);
+	SceneNode* n = new SceneNode(ID++, shape, m, Shader, TextureId);
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
@@ -266,63 +265,56 @@ SceneNode *black;
 void createSidebar() {
 	int id = 240;
 
-	Mesh *sq = new Mesh();
-	sq->loadMeshFile("../src/meshes/sidebar/cube.obj", TEXTURE_PATH);
+	Mesh *sq = new Mesh("../src/meshes/sidebar/cube.obj");
 	sq->createBufferObjects();
-	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader);
+	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	sqn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
 	sqn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	sqn->_angle = 45.0f;
 	sqn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *pr = new Mesh();
-	pr->loadMeshFile("../src/meshes/sidebar/prism.obj", "");
+	Mesh *pr = new Mesh("../src/meshes/sidebar/prism.obj");
 	pr->createBufferObjects();
-	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader);
+	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader, TextureId);
 	prn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
 	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	prn->_angle = 45.0f;
 	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *hs = new Mesh();
-	hs->loadMeshFile("../src/meshes/sidebar/halfCube.obj", "");
+	Mesh *hs = new Mesh("../src/meshes/sidebar/halfCube.obj");
 	hs->createBufferObjects();
-	SceneNode *hsn = new SceneNode(id++, 1, hs, SidebarShader);
+	SceneNode *hsn = new SceneNode(id++, 1, hs, SidebarShader, TextureId);
 	hsn->_position = glm::vec3(-0.15f, 0.3f, 0.0f);
 	hsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	hsn->_angle = 45.0f;
 	hsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *qs = new Mesh();
-	qs->loadMeshFile("../src/meshes/sidebar/quarterCube.obj", "");
+	Mesh *qs = new Mesh("../src/meshes/sidebar/quarterCube.obj");
 	qs->createBufferObjects();
-	SceneNode *qsn = new SceneNode(id++, 4, qs, SidebarShader);
+	SceneNode *qsn = new SceneNode(id++, 4, qs, SidebarShader, TextureId);
 	qsn->_position = glm::vec3(-0.15f, 0.0f, 0.0f);
 	qsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	qsn->_angle = 45.0f;
 	qsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *lpr = new Mesh();
-	lpr->loadMeshFile("../src/meshes/sidebar/halfPrism.obj", "");
+	Mesh *lpr = new Mesh("../src/meshes/sidebar/halfPrism.obj");
 	lpr->createBufferObjects();
-	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader);
+	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader, TextureId);
 	lprn->_position = glm::vec3(0.15f, 0.3f, 0.0f);
 	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	lprn->_angle = 45.0f;
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *cw = new Mesh();
-	cw->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
 	cw->createBufferObjects();
-	white = new SceneNode(id++, 0, sq, SidebarShader);
+	white = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	white->_position = glm::vec3(-0.10f, -0.3f, 0.0f);
 	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	Mesh *cb = new Mesh();
-	cb->loadMeshFile("../src/meshes/sidebar/cube.obj", "");
+	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
 	cb->createBufferObjects();
-	black = new SceneNode(id++, 0, sq, SidebarShader);
+	black = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	black->_position = glm::vec3(0.10f, -0.3f, 0.0f);
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -333,6 +325,20 @@ void createSidebar() {
 	sb.addNode(qsn);
 	sb.addNode(lprn);
 }
+
+void createTextures() {
+	int width,height;
+	unsigned char* img = SOIL_load_image(TEXTURE_PATH, &width, &height, NULL, SOIL_LOAD_RGB);
+
+	glGenTextures(1, &TextureId);
+	glBindTexture(GL_TEXTURE_2D, TextureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 
 void createBufferObjects() {
 	glGenBuffers(1, VboId);
@@ -420,7 +426,7 @@ void saveScene(std::string fileName) {
 }
 
 void loadScene(std::string fileName) {
-	std::cout << "<<<<< LOADING >>>>>" << std::endl;
+	std::cout << "<<<<< LOADING SCENE >>>>>" << std::endl;
 	std::ifstream myfile(fileName);
 	std::string line;
 	
@@ -910,6 +916,7 @@ void init(int argc, char* argv[])
 	createBufferObjects();
 	setupCallbacks();
 
+	createTextures();
 	createSidebar();
 }
 

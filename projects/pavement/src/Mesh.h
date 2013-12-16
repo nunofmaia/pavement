@@ -14,44 +14,25 @@
 #include "Engine.h"
 
 class Mesh {
-public:
-	
+
 	std::vector< glm::vec4 > vertices;
 	std::vector< glm::vec4 > normals;
 	std::vector< glm::vec2 > textures;
+	bool readUV;
+	GLuint VaoId, VboId[4];
+
+public:
 
 	Mesh(void);
+	Mesh(std::string);
 	Mesh(Mesh*);
 	~Mesh(void);
 
-	void setAngle(GLfloat);
-
-	void parse();
-	void loadMeshFile(std::string filePath, std::string texturePath);
-	void printMesh();
+	void draw();
 	void createBufferObjects();
-	virtual void draw();
-
-	std::vector< glm::vec4 >*getVertices();
+	void parse(std::string);
 	void reverseElements();
-	void addCopy(Mesh*);
-	void updateCopies();
-	void setPosition(glm::vec3);
 
-	void loadTextureFile(GLuint pId);
-
-private:
-	std::string meshString;
-
-	std::vector< glm::vec4 > vertexIndices;
-	std::vector< glm::vec4 > normalIndices;
-	std::vector< glm::vec2 > textureIndices;
-
-	bool readMtl,readUV,hasTexture;
-
-	GLuint VaoId, VboId[4], textureId, pId;
-	
-	std::string texturePath;
 };
 
 

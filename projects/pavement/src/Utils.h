@@ -18,7 +18,6 @@ public:
 				myStringFile = myStringFile + aux + '\n';
 			}
 
-			std::cout <<filePath << " imported." << std::endl;
 			return myStringFile;
 		} else {
 			return NULL;	

@@ -7,7 +7,7 @@ SceneNode::SceneNode() {
 
 SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 	_mesh = mesh;
-	_mesh->loadTextureFile(shader->getProgramId());
+	//_mesh->loadTextureFile(shader->getProgramId());
 	_shader = shader;
 	_id = id;
 	_shape = shape;
@@ -15,17 +15,37 @@ SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
 	_angle = 0.0f;
 	_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	_textureLoaded = false;
+}
+
+SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuint textureId) {
+	_mesh = mesh;
+	//_mesh->loadTextureFile(shader->getProgramId());
+	_shader = shader;
+	_id = id;
+	_shape = shape;
+	_canDraw = true;
+	_color = glm::vec4(1.0, 0.98, 0.92, 1.0);
+	_angle = 0.0f;
+	_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	
+	_textureLoaded = true;
+	_textureId = textureId;
 }
 
 SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 	_id = node->_id;
 	_position = node->_position;
 	_mesh = new Mesh(node->_mesh);
-	_mesh->loadTextureFile(p->getProgramId());
+	//_mesh->loadTextureFile(p->getProgramId());
 	_color = node->_color;
 	_angle = node->_angle;
 	_shader = p;
 	_scale = node->_scale;
+
+	_textureLoaded = node->_textureLoaded;
+	_textureId = node->_textureId;
 }
 
 
@@ -62,11 +82,19 @@ void SceneNode::setAngle(GLfloat angle) {
 void SceneNode::draw() {
 
 	if(_canDraw) {
+
 		if (_shader != NULL) {
 			_shader->useShaderProgram();
 			_shader->setUniform("ModelMatrix", glm::scale(glm::translate(glm::mat4(1.0), _position), _scale));
 			_shader->setUniform("DefaultColor", _color);
 			_shader->setUniform("Angle", _angle);
+		}
+
+		if (_textureLoaded) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _textureId);
+			GLint uniform_mytexture = glGetUniformLocation(_shader->getProgramId(), "texture_uniform");
+			glUniform1i(uniform_mytexture, /*GL_TEXTURE*/0);
 		}
 	
 		glEnable(GL_STENCIL_TEST);

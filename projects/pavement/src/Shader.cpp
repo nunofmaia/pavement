@@ -203,7 +203,6 @@ int ShaderProgram::getProgramId(){
 
 void ShaderProgram::setProgramId(){
 	programId = glCreateProgram();
-	std::cout<<"programid is: "<< programId<<std::endl;
 }
 
 bool ShaderProgram::isLinked(){

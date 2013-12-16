@@ -17,10 +17,12 @@ struct SceneNode {
 	glm::vec4 _color;
 	GLfloat _angle;
 	glm::vec3 _scale;
-	bool _canDraw;
+	bool _canDraw, _textureLoaded;
+	GLuint _textureId;
 
 	SceneNode();
 	SceneNode(int, int, Mesh*, ShaderProgram*);
+	SceneNode(int, int, Mesh*, ShaderProgram*, GLuint);
 	SceneNode(SceneNode*, ShaderProgram*);
 	~SceneNode();
 	void setColor(glm::vec4);

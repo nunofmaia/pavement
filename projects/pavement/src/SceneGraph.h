@@ -8,6 +8,7 @@
 
 struct SceneNode {
 
+	GLuint VaoId, VboId[3];
 	std::vector<SceneNode*> _copies;
 	Mesh* _mesh;
 	ShaderProgram* _shader;
@@ -17,7 +18,7 @@ struct SceneNode {
 	glm::vec4 _color;
 	GLfloat _angle;
 	glm::vec3 _scale;
-	bool _canDraw, _textureLoaded;
+	bool _canDraw, _textureLoaded, _toRevert;
 	GLuint _textureId;
 
 	SceneNode();
@@ -29,6 +30,7 @@ struct SceneNode {
 	void setPosition(glm::vec3);
 	void setAngle(GLfloat);
 	void draw();
+	void createBufferObjects();
 	void addCopy(SceneNode*);
 	void hideCopies(ShaderProgram*);
 	void showCopies(ShaderProgram*);

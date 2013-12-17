@@ -9,19 +9,16 @@
 #include <vector>
 #include <string>
 #include <sstream> 
+#include <map>
 
 #include "soil\src\SOIL.h"
 #include "Engine.h"
 
-class Mesh {
+struct Mesh {
 
-	std::vector< glm::vec4 > vertices;
-	std::vector< glm::vec4 > normals;
-	std::vector< glm::vec2 > textures;
-	bool readUV;
-	GLuint VaoId, VboId[4];
-
-public:
+	std::vector< glm::vec4 > _vertices;
+	std::vector< glm::vec4 > _normals;
+	std::vector< glm::vec2 > _textures;
 
 	Mesh(void);
 	Mesh(std::string);
@@ -29,12 +26,22 @@ public:
 	~Mesh(void);
 
 	void draw();
-	void createBufferObjects();
 	void parse(std::string);
-	void reverseElements();
 
 };
 
+class MeshManager {
+
+	std::map<int, Mesh*> _meshes;
+
+public:
+
+	MeshManager();
+	~MeshManager();
+
+	void addMesh(int, Mesh*);
+	Mesh* getMesh(int);
+};
 
 #endif
 

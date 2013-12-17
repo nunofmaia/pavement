@@ -11,6 +11,7 @@
 #include <map>
 #include <cstring>
 #include <cstdlib>
+#include <stack>
 
 #include "Engine.h"
 #include "Shader.h"
@@ -32,7 +33,7 @@
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
-bool canDrag=false;
+bool canDrag = false;
 
 GLuint VaoId, VboId[4], TextureId;
 GLint UboId, UniformId;
@@ -46,6 +47,9 @@ ShaderProgram *GridShader;
 ShaderProgram *SidebarShader;
 
 SceneGraph *Scene = new SceneGraph();
+MeshManager *Manager = new MeshManager();
+
+std::stack<int> AvailableIds;
 
 Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 Grid grid(20);
@@ -53,10 +57,9 @@ Sidebar sb;
 
 
 int ID = 1;
+int CurrentID = 0;
 int lastMx = 0, lastMy = 0;
 SceneNode* SelectedNode;
-
-std::map<int, std::string> Shapes;
 
 enum SymmetryMode {
 	NONE,
@@ -70,11 +73,11 @@ int SymMode = SymmetryMode::NONE;
 
 
 void initializeShapes() {
-	Shapes[0] = "cube";
-	Shapes[1] = "halfCube";
-	Shapes[2] = "prism";
-	Shapes[3] = "halfPrism";
-	Shapes[4] = "quarterCube";
+	Manager->addMesh(0, new Mesh("../src/meshes/cube.obj"));
+	Manager->addMesh(1, new Mesh("../src/meshes/halfCube.obj"));
+	Manager->addMesh(2, new Mesh("../src/meshes/prism.obj"));
+	Manager->addMesh(3, new Mesh("../src/meshes/halfPrism.obj"));
+	Manager->addMesh(4, new Mesh("../src/meshes/quarterCube.obj"));
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -101,28 +104,42 @@ void checkOpenGLError(std::string error)
 
 /////////////////////////////////////////////////////////////////////// SHADERs
 
+
+
 //this should be renamed to addNode
 SceneNode* createMesh(int shape) {
-
 	// Original solid
-	Mesh* m = new Mesh(MESH_PATH + Shapes[shape] + ".obj");
-	m->createBufferObjects();
-	SceneNode* n = new SceneNode(ID++, shape, m, Shader, TextureId);
+	Mesh* m = Manager->getMesh(shape);
+	int id;
+
+	if (AvailableIds.empty()) {
+		id = ID++;
+	} else {
+		id = AvailableIds.top();
+		AvailableIds.pop();
+	}
+
+	CurrentID = id;
+
+	SceneNode* n = new SceneNode(id, shape, m, Shader, TextureId);
+	n->createBufferObjects();
 	n->_position = glm::vec3(0.125, 0.125, 0.125);
 
 	// X reflection solid
 	SceneNode* nX = new SceneNode(n, ReflectionX);
-	nX->_mesh->reverseElements();
-	nX->_mesh->createBufferObjects();
+	//nX->_mesh->reverseElements();
+	nX->_toRevert = true;
+	nX->createBufferObjects();
 
 	// Z reflection solid
 	SceneNode* nZ = new SceneNode(n, ReflectionZ);
-	nZ->_mesh->reverseElements();
-	nZ->_mesh->createBufferObjects();
+	//nZ->_mesh->reverseElements();
+	nZ->_toRevert = true;
+	nZ->createBufferObjects();
 
 	// Origin reflection solid
 	SceneNode* nO = new SceneNode(n, ReflectionO);
-	nO->_mesh->createBufferObjects();
+	nO->createBufferObjects();
 
 	n->addCopy(nX);
 	n->addCopy(nZ);
@@ -266,55 +283,55 @@ void createSidebar() {
 	int id = 240;
 
 	Mesh *sq = new Mesh("../src/meshes/sidebar/cube.obj");
-	sq->createBufferObjects();
 	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	sqn->createBufferObjects();
 	sqn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
 	sqn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	sqn->_angle = 45.0f;
 	sqn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *pr = new Mesh("../src/meshes/sidebar/prism.obj");
-	pr->createBufferObjects();
 	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader, TextureId);
+	prn->createBufferObjects();
 	prn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
 	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	prn->_angle = 45.0f;
 	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *hs = new Mesh("../src/meshes/sidebar/halfCube.obj");
-	hs->createBufferObjects();
 	SceneNode *hsn = new SceneNode(id++, 1, hs, SidebarShader, TextureId);
+	hsn->createBufferObjects();
 	hsn->_position = glm::vec3(-0.15f, 0.3f, 0.0f);
 	hsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	hsn->_angle = 45.0f;
 	hsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *qs = new Mesh("../src/meshes/sidebar/quarterCube.obj");
-	qs->createBufferObjects();
 	SceneNode *qsn = new SceneNode(id++, 4, qs, SidebarShader, TextureId);
+	qsn->createBufferObjects();
 	qsn->_position = glm::vec3(-0.15f, 0.0f, 0.0f);
 	qsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	qsn->_angle = 45.0f;
 	qsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *lpr = new Mesh("../src/meshes/sidebar/halfPrism.obj");
-	lpr->createBufferObjects();
 	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader, TextureId);
+	lprn->createBufferObjects();
 	lprn->_position = glm::vec3(0.15f, 0.3f, 0.0f);
 	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	lprn->_angle = 45.0f;
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
-	cw->createBufferObjects();
 	white = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	white->createBufferObjects();
 	white->_position = glm::vec3(-0.10f, -0.3f, 0.0f);
 	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
-	cb->createBufferObjects();
 	black = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	black->createBufferObjects();
 	black->_position = glm::vec3(0.10f, -0.3f, 0.0f);
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -462,6 +479,7 @@ void loadScene(std::string fileName) {
 
 void deleteSelected() {
 	if (SelectedNode != NULL) {
+		AvailableIds.push(SelectedNode->_id);
 		Scene->deleteNode(SelectedNode);
 		SelectedNode = NULL;
 	}
@@ -531,6 +549,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'd':
 		Scene->deleteAllNodes();
+		ID = 1;
 		break;
 	//backspace key has an ascii number
 	case 8:
@@ -665,7 +684,7 @@ void meshSelector(GLfloat data) {
 			canDrag=true;
 		}
 		createMesh(0);
-		SelectedNode = Scene->findNode(ID - 1);
+		SelectedNode = Scene->findNode(CurrentID);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -684,7 +703,7 @@ void meshSelector(GLfloat data) {
 			canDrag=true;
 		}
 		createMesh(2);
-		SelectedNode = Scene->findNode(ID - 1);
+		SelectedNode = Scene->findNode(CurrentID);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -703,7 +722,7 @@ void meshSelector(GLfloat data) {
 			canDrag=true;
 		}
 		createMesh(1);
-		SelectedNode = Scene->findNode(ID - 1);
+		SelectedNode = Scene->findNode(CurrentID);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -722,7 +741,7 @@ void meshSelector(GLfloat data) {
 			canDrag=true;
 		}
 		createMesh(4);
-		SelectedNode = Scene->findNode(ID - 1);
+		SelectedNode = Scene->findNode(CurrentID);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -741,7 +760,7 @@ void meshSelector(GLfloat data) {
 			canDrag=true;
 		}
 		createMesh(3);
-		SelectedNode = Scene->findNode(ID - 1);
+		SelectedNode = Scene->findNode(CurrentID);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -797,7 +816,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				}
 
 				SelectedNode = NULL;
-				canDrag=true;
+				canDrag = true;
 			} else {
 				if (SelectedNode != NULL) {
 					if (data == SelectedNode->_id) {
@@ -806,7 +825,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						SelectedNode->setPosition(currentPosition);
 
 						SelectedNode = NULL;
-						canDrag=true;
+						canDrag = true;
 					}
 				} else {
 					SelectedNode = Scene->findNode(GLint(data));

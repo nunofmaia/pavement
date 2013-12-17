@@ -7,7 +7,6 @@ SceneNode::SceneNode() {
 
 SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 	_mesh = mesh;
-	//_mesh->loadTextureFile(shader->getProgramId());
 	_shader = shader;
 	_id = id;
 	_shape = shape;
@@ -17,11 +16,11 @@ SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 	_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	_textureLoaded = false;
+	_toRevert = false;
 }
 
 SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuint textureId) {
 	_mesh = mesh;
-	//_mesh->loadTextureFile(shader->getProgramId());
 	_shader = shader;
 	_id = id;
 	_shape = shape;
@@ -32,13 +31,14 @@ SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuin
 	
 	_textureLoaded = true;
 	_textureId = textureId;
+	_toRevert = false;
 }
 
 SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 	_id = node->_id;
 	_position = node->_position;
-	_mesh = new Mesh(node->_mesh);
-	//_mesh->loadTextureFile(p->getProgramId());
+	//_mesh = new Mesh(node->_mesh);
+	_mesh = node->_mesh;
 	_color = node->_color;
 	_angle = node->_angle;
 	_shader = p;
@@ -46,6 +46,7 @@ SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 
 	_textureLoaded = node->_textureLoaded;
 	_textureId = node->_textureId;
+	_toRevert = false;
 }
 
 
@@ -78,6 +79,53 @@ void SceneNode::setAngle(GLfloat angle) {
 	}
 }
 
+void SceneNode::createBufferObjects() {
+
+	std::vector<glm::vec4> v = _mesh->_vertices;
+	std::vector<glm::vec4> n = _mesh->_normals;
+	std::vector<glm::vec2> t = _mesh->_textures;
+
+	if (_toRevert) {
+		std::reverse(v.begin(), v.end());
+		std::reverse(n.begin(), n.end());
+	} else {
+		std::reverse(t.begin(), t.end());
+	}
+
+
+
+	glGenVertexArrays(1, &VaoId);
+
+	glBindVertexArray(VaoId);
+
+	glGenBuffers(3, VboId);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VboId[0]);
+	glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(glm::vec4), &v[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(VERTICES);
+	glVertexAttribPointer(VERTICES, 4, GL_FLOAT, GL_FALSE, sizeof( glm::vec4 ), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
+	glBufferData(GL_ARRAY_BUFFER, t.size()*sizeof(glm::vec2), &t[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(TEXTURES);
+	glVertexAttribPointer(TEXTURES, 2, GL_FLOAT, GL_FALSE, sizeof( glm::vec2 ), 0); 
+
+	glBindBuffer(GL_ARRAY_BUFFER, VboId[2]);
+	glBufferData(GL_ARRAY_BUFFER, n.size()*sizeof(glm::vec4), &n[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(NORMALS);
+	glVertexAttribPointer(NORMALS, 4, GL_FLOAT, GL_FALSE, sizeof( glm::vec4 ), 0);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(VERTICES);
+	glDisableVertexAttribArray(TEXTURES);
+	glDisableVertexAttribArray(NORMALS);
+
+	_toRevert = false;
+	//checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
+}
+
+
 
 void SceneNode::draw() {
 
@@ -101,7 +149,10 @@ void SceneNode::draw() {
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilFunc(GL_ALWAYS, _id, 0xFF);
 
+
+		glBindVertexArray(VaoId);
 		_mesh->draw();
+		glBindVertexArray(0);
 
 		glDisable(GL_STENCIL_TEST);
 

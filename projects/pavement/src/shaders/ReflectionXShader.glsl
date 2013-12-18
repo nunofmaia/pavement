@@ -47,7 +47,7 @@ void main(void)
 	mat4 NM = transpose(inverse(MV));
 
 	v = vec3(MV * Position);
-	n = vec3(normalize(NM * Normal));
+	n = normalize(vec3(NM * Normal));
 
 	gl_Position = ProjectionMatrix * ViewMatrix * MM * RM * Position;
 	ex_Color = DefaultColor;

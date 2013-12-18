@@ -26,7 +26,7 @@
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
-bool canDrag = false;
+bool canDrag = true;
 
 GLuint VaoId, VboId[4], TextureId[2];
 GLint UboId, UniformId;
@@ -71,6 +71,7 @@ void initializeMeshes() {
 	Manager->addMesh(2, new Mesh("../src/meshes/prism.obj"));
 	Manager->addMesh(3, new Mesh("../src/meshes/halfPrism.obj"));
 	Manager->addMesh(4, new Mesh("../src/meshes/quarterCube.obj"));
+	Manager->addMesh(5, new Mesh("../src/meshes/smooth_sphere.obj"));
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -269,7 +270,7 @@ void createSidebar() {
 	Mesh *sq = new Mesh("../src/meshes/sidebar/cube.obj");
 	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	sqn->createBufferObjects();
-	sqn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
+	sqn->_position = glm::vec3(-0.15f, 1.2f, 0.0f);
 	sqn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	sqn->_angle = 45.0f;
 	sqn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -277,7 +278,7 @@ void createSidebar() {
 	Mesh *pr = new Mesh("../src/meshes/sidebar/prism.obj");
 	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader, TextureId);
 	prn->createBufferObjects();
-	prn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
+	prn->_position = glm::vec3(0.15f, 1.2f, 0.0f);
 	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	prn->_angle = 45.0f;
 	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -285,7 +286,7 @@ void createSidebar() {
 	Mesh *hs = new Mesh("../src/meshes/sidebar/halfCube.obj");
 	SceneNode *hsn = new SceneNode(id++, 1, hs, SidebarShader, TextureId);
 	hsn->createBufferObjects();
-	hsn->_position = glm::vec3(-0.15f, 0.3f, 0.0f);
+	hsn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
 	hsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	hsn->_angle = 45.0f;
 	hsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -301,7 +302,7 @@ void createSidebar() {
 	Mesh *lpr = new Mesh("../src/meshes/sidebar/halfPrism.obj");
 	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader, TextureId);
 	lprn->createBufferObjects();
-	lprn->_position = glm::vec3(0.15f, 0.3f, 0.0f);
+	lprn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
 	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	lprn->_angle = 45.0f;
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -309,14 +310,14 @@ void createSidebar() {
 	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
 	white = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	white->createBufferObjects();
-	white->_position = glm::vec3(-0.15f, -0.3f, 0.0f);
+	white->_position = glm::vec3(-0.15f, -0.6f, 0.0f);
 	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
 	black = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	black->createBufferObjects();
-	black->_position = glm::vec3(0.15f, -0.3f, 0.0f);
+	black->_position = glm::vec3(0.15f, -0.6f, 0.0f);
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
@@ -396,7 +397,7 @@ void drawScene() {
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.0f, 1.0f, 2.0f, 7.0f)));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
 	glViewport(640, 0, 260, 640);
 	
 	sb.draw();
@@ -535,6 +536,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'm':
 		addNode(4);
 		break;
+	case 'k':
+		addNode(5);
+		break;
 	case 'd':
 		Scene->deleteAllNodes();
 		ID = 1;
@@ -646,6 +650,9 @@ void keyboardSpecial(int key, int x, int y) {
 int MouseX = 0;
 int MouseY = 0;
 
+int DragX = 0;
+int DragY = 0;
+
 glm::vec4 Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
 
 void changeSidebarMeshColor() {
@@ -669,7 +676,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(0);
 		if (SelectedNode != NULL) {
@@ -677,6 +684,8 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+
+			canDrag = false;
 		}
 		break;
 	case 241:
@@ -687,7 +696,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(2);
 		if (SelectedNode != NULL) {
@@ -695,6 +704,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 242:
@@ -705,7 +715,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(1);
 		if (SelectedNode != NULL) {
@@ -713,6 +723,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 243:
@@ -723,7 +734,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(4);
 		if (SelectedNode != NULL) {
@@ -731,6 +742,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 244:
@@ -741,7 +753,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(3);
 		if (SelectedNode != NULL) {
@@ -749,6 +761,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 245:
@@ -787,6 +800,9 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			MouseY = y;
 			lastMx = x;
 			lastMy = y;
+			DragX = x;
+			DragY = y;
+
 			GLfloat data;
 			glReadPixels(MouseX, WinY - MouseY - 1, 1, 1, GL_STENCIL_INDEX, GL_FLOAT, &data);
 
@@ -802,15 +818,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				canDrag = true;
 			} else {
 				if (SelectedNode != NULL) {
-					if (data == SelectedNode->_id) {
-						glm::vec3 currentPosition = SelectedNode->_position;
-						currentPosition.y -= 0.25;
-						SelectedNode->setPosition(currentPosition);
-
-						SelectedNode = NULL;
-						canDrag = true;
-					}
-					else {
+					if (data != SelectedNode->_id) {
 						SceneNode* nextNode = Scene->findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;
@@ -821,6 +829,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 							 currentPosition = SelectedNode->_position;
 							currentPosition.y += 0.25;
 							SelectedNode->setPosition(currentPosition);
+
+							canDrag = false;
 						}
 					}
 				} else {
@@ -829,6 +839,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						glm::vec3 currentPosition = SelectedNode->_position;
 						currentPosition.y += 0.25;
 						SelectedNode->setPosition(currentPosition);
+
+						canDrag = false;
 					}
 				}
 				
@@ -839,25 +851,71 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			myCamera->rotationAngleX=0.0f;
 			myCamera->rotationAngleY=0.0f;
 			//myCamera->setUpdateVMatrixFlag(false);
-			canDrag=false;
+			canDrag = false;
 		}
 		break;
 	}
 }
 
+
 void mouseMotion(int x, int y) {
 
-	if (canDrag){
+	if (canDrag) {
 		myCamera->rotationAngleY = (float)(x - lastMx);
 		myCamera->rotationAngleX = (float)(y - lastMy);
 		myCamera->setUpdateVMatrixFlag(true);
 		lastMx = x;
 		lastMy = y; 
 	}
+
+	if (SelectedNode != NULL) {
+		int diffX = x - DragX;
+		int diffY = y - DragY;
+
+		if (diffX > 40) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.x += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			DragX = x;
+
+		} else if (diffX < -40) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.x -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+			DragX = x;
+		}
+
+		if (diffY > 40) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.z += 0.25;
+			SelectedNode->setPosition(currentPosition);
+			DragY = y;
+
+		} else if (diffY < -40) {
+			glm::vec3 currentPosition = SelectedNode->_position;
+			currentPosition.z -= 0.25;
+			SelectedNode->setPosition(currentPosition);
+			DragY = y;
+		}
+	}
+
 }
 
 void wheel(int button, int dir, int x, int y) {
-	myCamera->zoom(dir);
+
+	if (SelectedNode != NULL) {
+		GLfloat newAngle;
+		if (dir > 0) {
+			newAngle = SelectedNode->_angle + 90.0f;
+			SelectedNode->setAngle(newAngle);
+		} else {
+			newAngle = SelectedNode->_angle - 90.0f;
+			SelectedNode->setAngle(newAngle);
+		}
+	} else {
+		myCamera->zoom(dir);
+	}
+
 }
 
 /////////////////////////////////////////////////////////////////////// SETUP

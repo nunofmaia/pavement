@@ -40,7 +40,7 @@ void main(void)
 	mat4 NM = transpose(inverse(MV));
 
 	v = vec3(MV * in_Position);
-	n= vec3(NM * in_Normal);
+	n= normalize(vec3(NM * in_Normal));
 	ex_Color = DefaultColor;
 	ex_TexCoord = in_TexCoord;
 }

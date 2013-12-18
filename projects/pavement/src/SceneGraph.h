@@ -19,11 +19,11 @@ struct SceneNode {
 	GLfloat _angle;
 	glm::vec3 _scale;
 	bool _canDraw, _textureLoaded, _toRevert;
-	GLuint _textureId;
+	GLuint _textureId[2];
 
 	SceneNode();
 	SceneNode(int, int, Mesh*, ShaderProgram*);
-	SceneNode(int, int, Mesh*, ShaderProgram*, GLuint);
+	SceneNode(int, int, Mesh*, ShaderProgram*, GLuint*);
 	SceneNode(SceneNode*, ShaderProgram*);
 	~SceneNode();
 	void setColor(glm::vec4);

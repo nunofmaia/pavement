@@ -21,13 +21,14 @@
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
 #define TEXTURE_PATH "../src/meshes/basalt2rough.png"
+#define NOISE_TEXTURE_PATH "../src/meshes/PerlinNoise.jpg"
 
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
-bool canDrag = false;
+bool canDrag = true;
 
-GLuint VaoId, VboId[4], TextureId;
+GLuint VaoId, VboId[4], TextureId[2];
 GLint UboId, UniformId;
 const GLuint UBO_BP = 0;
 
@@ -328,15 +329,23 @@ void createSidebar() {
 }
 
 void createTextures() {
-	int width,height;
-	unsigned char* img = SOIL_load_image(TEXTURE_PATH, &width, &height, NULL, SOIL_LOAD_RGB);
-
-	glGenTextures(1, &TextureId);
-	glBindTexture(GL_TEXTURE_2D, TextureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+	int width1,height1,width2,height2;
+	
+	unsigned char* img1 = SOIL_load_image(TEXTURE_PATH, &width1, &height1, NULL, SOIL_LOAD_RGB);
+	unsigned char* img2 = SOIL_load_image(NOISE_TEXTURE_PATH, &width2, &height2, NULL, SOIL_LOAD_RGB);
+	
+	glGenTextures(2, TextureId);
+	
+	glBindTexture(GL_TEXTURE_2D, TextureId[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, img1);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glBindTexture(GL_TEXTURE_2D, TextureId[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, img2);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -667,7 +676,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(0);
 		if (SelectedNode != NULL) {
@@ -675,6 +684,8 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+
+			canDrag = false;
 		}
 		break;
 	case 241:
@@ -685,7 +696,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(2);
 		if (SelectedNode != NULL) {
@@ -693,6 +704,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 242:
@@ -703,7 +715,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(1);
 		if (SelectedNode != NULL) {
@@ -711,6 +723,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 243:
@@ -721,7 +734,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(4);
 		if (SelectedNode != NULL) {
@@ -729,6 +742,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 244:
@@ -739,7 +753,7 @@ void nodeSelector(GLfloat data) {
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			canDrag=true;
+			//canDrag = true;
 		}
 		SelectedNode = addNode(3);
 		if (SelectedNode != NULL) {
@@ -747,6 +761,7 @@ void nodeSelector(GLfloat data) {
 			currentPosition.y += 0.25;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			canDrag = false;
 		}
 		break;
 	case 245:
@@ -803,15 +818,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				canDrag = true;
 			} else {
 				if (SelectedNode != NULL) {
-					if (data == SelectedNode->_id) {
-						/*glm::vec3 currentPosition = SelectedNode->_position;
-						currentPosition.y -= 0.25;
-						SelectedNode->setPosition(currentPosition);
-
-						SelectedNode = NULL;
-						canDrag = true;*/
-					}
-					else {
+					if (data != SelectedNode->_id) {
 						SceneNode* nextNode = Scene->findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;
@@ -822,6 +829,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 							 currentPosition = SelectedNode->_position;
 							currentPosition.y += 0.25;
 							SelectedNode->setPosition(currentPosition);
+
+							canDrag = false;
 						}
 					}
 				} else {
@@ -830,6 +839,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						glm::vec3 currentPosition = SelectedNode->_position;
 						currentPosition.y += 0.25;
 						SelectedNode->setPosition(currentPosition);
+
+						canDrag = false;
 					}
 				}
 				
@@ -849,7 +860,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 
 void mouseMotion(int x, int y) {
 
-	if (canDrag){
+	if (canDrag) {
 		myCamera->rotationAngleY = (float)(x - lastMx);
 		myCamera->rotationAngleX = (float)(y - lastMy);
 		myCamera->setUpdateVMatrixFlag(true);
@@ -891,9 +902,6 @@ void mouseMotion(int x, int y) {
 }
 
 void wheel(int button, int dir, int x, int y) {
-	if (canDrag) {
-		myCamera->zoom(dir);
-	}
 
 	if (SelectedNode != NULL) {
 		GLfloat newAngle;
@@ -904,6 +912,8 @@ void wheel(int button, int dir, int x, int y) {
 			newAngle = SelectedNode->_angle - 90.0f;
 			SelectedNode->setAngle(newAngle);
 		}
+	} else {
+		myCamera->zoom(dir);
 	}
 
 }

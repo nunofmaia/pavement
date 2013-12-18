@@ -20,7 +20,7 @@
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
-#define TEXTURE_PATH "../src/meshes/basalt2rough.png"
+#define TEXTURE_PATH "../src/meshes/basalt2.png"
 #define NOISE_TEXTURE_PATH "../src/meshes/PerlinNoise.jpg"
 
 int WinX = 900, WinY = 640;
@@ -766,7 +766,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Black" << std::endl;
 
 		if (SelectedNode != NULL) {
-			SelectedNode->setColor(glm::vec4(0.1, 0.1, 0.1, 1.0));
+			SelectedNode->setColor(glm::vec4(0.3, 0.3, 0.4, 1.0));
 		} else {
 			Color = glm::vec4(0.1, 0.1, 0.1, 1.0);
 			changeSidebarMeshColor();

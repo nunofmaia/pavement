@@ -10,8 +10,8 @@ out vec4 out_Color;
 uniform sampler2D texture_uniform;
 uniform sampler2D noise_texture_uniform;
 
-#define ONE 1/256
-#define ONEHALF 0.5/256
+float one = 0.0009765625;
+float onehalf = 0.00048828125;
 // The numbers above are 1/256 and 0.5/256, change accordingly
 // if you change the code to use another texture size.
 
@@ -31,7 +31,7 @@ float fade(float t) {
  */
 float noise(vec2 P)
 {
-  vec2 Pi = ONE*floor(P)+ONEHALF; // Integer part, scaled and offset for texture lookup
+  vec2 Pi = one*floor(P)+onehalf; // Integer part, scaled and offset for texture lookup
   vec2 Pf = fract(P);             // Fractional part for interpolation
 
   // Noise contribution from lower left corner
@@ -39,15 +39,15 @@ float noise(vec2 P)
   float n00 = dot(grad00, Pf);
 
   // Noise contribution from lower right corner
-  vec2 grad10 = texture2D(noise_texture_uniform, Pi + vec2(ONE, 0.0)).rg * 4.0 - 1.0;
+  vec2 grad10 = texture2D(noise_texture_uniform, Pi + vec2(one, 0.0)).rg * 4.0 - 1.0;
   float n10 = dot(grad10, Pf - vec2(1.0, 0.0));
 
   // Noise contribution from upper left corner
-  vec2 grad01 = texture2D(noise_texture_uniform, Pi + vec2(0.0, ONE)).rg * 4.0 - 1.0;
+  vec2 grad01 = texture2D(noise_texture_uniform, Pi + vec2(0.0, one)).rg * 4.0 - 1.0;
   float n01 = dot(grad01, Pf - vec2(0.0, 1.0));
 
   // Noise contribution from upper right corner
-  vec2 grad11 = texture2D(noise_texture_uniform, Pi + vec2(ONE, ONE)).rg * 4.0 - 1.0;
+  vec2 grad11 = texture2D(noise_texture_uniform, Pi + vec2(one, one)).rg * 4.0 - 1.0;
   float n11 = dot(grad11, Pf - vec2(1.0, 1.0));
 
   // Blend contributions along x
@@ -60,6 +60,10 @@ float noise(vec2 P)
   return n_xy;
 }
 
+
+
+
+
 void main(void) {
 	vec3 normal = normalize(n);
 	vec3 eye = vec3(0.0, 5.0, 5.0);
@@ -67,7 +71,7 @@ void main(void) {
 	vec4 diffuseLight = ex_Color;
 	vec4 ambientLight = vec4(0.1,0.1,0.1,1.0);
 	vec4 specularLight = vec4(0.5,0.5,0.5,1.0);
-	float shininess = 5.0;
+	float shininess = 10.0;
 
 	vec3 L = normalize(lightSource - v);
 	vec3 E = normalize(eye - v);
@@ -83,9 +87,10 @@ void main(void) {
 	
 	//out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 5.0)) * (Idiff + Iamb + Ispec);
 	
-  float noise_val = cos(texture2D(noise_texture_uniform,ex_TexCoord).r);
+  float noise_val = (texture2D(noise_texture_uniform,ex_TexCoord).r * 0.5 + 0.7);
+
   //float noise_val = noise(ex_TexCoord);
 
-  out_Color = texture2D(texture_uniform,ex_TexCoord) * noise_val * Idiff + (Iamb + Ispec);
+  out_Color = (texture2D(texture_uniform,ex_TexCoord) * noise_val) * Idiff + Ispec;
 
 }

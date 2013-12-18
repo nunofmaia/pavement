@@ -94,9 +94,6 @@
     <ClInclude Include="..\src\Sidebar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\IDrawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\src\meshes\monkey.obj">

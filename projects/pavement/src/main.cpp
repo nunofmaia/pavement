@@ -1,9 +1,3 @@
-///////////////////////////////////////////////////////////////////////
-//
-// Assignment 4
-//
-///////////////////////////////////////////////////////////////////////
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,17 +13,15 @@
 #include "Grid.h"
 #include "Camera.h"
 #include "SceneGraph.h"
-
 #include "Sidebar.h"
 
-#define CAPTION "Tangram"
+#define CAPTION "Pedras e Calcada"
 
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
 #define TEXTURE_PATH "../src/meshes/basalt2rough.png"
 
-//int WinX = 640, WinY = 640;
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
@@ -72,7 +64,7 @@ enum SymmetryMode {
 int SymMode = SymmetryMode::NONE;
 
 
-void initializeShapes() {
+void initializeMeshes() {
 	Manager->addMesh(0, new Mesh("../src/meshes/cube.obj"));
 	Manager->addMesh(1, new Mesh("../src/meshes/halfCube.obj"));
 	Manager->addMesh(2, new Mesh("../src/meshes/prism.obj"));
@@ -94,9 +86,8 @@ bool isOpenGLError() {
 	return isError;
 }
 
-void checkOpenGLError(std::string error)
-{
-	if(isOpenGLError()) {
+void checkOpenGLError(std::string error) {
+	if (isOpenGLError()) {
 		std::cerr << error << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -104,10 +95,7 @@ void checkOpenGLError(std::string error)
 
 /////////////////////////////////////////////////////////////////////// SHADERs
 
-
-
-//this should be renamed to addNode
-SceneNode* createMesh(int shape) {
+SceneNode* addNode(int shape) {
 	// Original solid
 	Mesh* m = Manager->getMesh(shape);
 	int id;
@@ -127,13 +115,11 @@ SceneNode* createMesh(int shape) {
 
 	// X reflection solid
 	SceneNode* nX = new SceneNode(n, ReflectionX);
-	//nX->_mesh->reverseElements();
 	nX->_toRevert = true;
 	nX->createBufferObjects();
 
 	// Z reflection solid
 	SceneNode* nZ = new SceneNode(n, ReflectionZ);
-	//nZ->_mesh->reverseElements();
 	nZ->_toRevert = true;
 	nZ->createBufferObjects();
 
@@ -172,8 +158,7 @@ SceneNode* createMesh(int shape) {
 }
 
 
-void createShaderProgram()
-{
+void createShaderProgram() {
 	Shader = new ShaderProgram();
 
 	Shader->setProgramId();
@@ -259,22 +244,20 @@ void createShaderProgram()
 	checkOpenGLError("ERROR: Could not create shaders.");
 }
 
-void destroyShaderProgram()
-{
+void destroyShaderProgram() {
 	glUseProgram(0);
-
-	//TODO: Detach shaders
 
 	delete(Shader);
 	delete(ReflectionX);
+	delete(ReflectionZ);
+	delete(ReflectionO);
 	delete(GridShader);
+	delete(SidebarShader);
 
 	checkOpenGLError("ERROR: Could not destroy shaders.");
 }
 
 /////////////////////////////////////////////////////////////////////// VAOs & VBOs
-
-typedef GLfloat Matrix[16];
 
 SceneNode *white;
 SceneNode *black;
@@ -325,14 +308,14 @@ void createSidebar() {
 	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
 	white = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	white->createBufferObjects();
-	white->_position = glm::vec3(-0.10f, -0.3f, 0.0f);
+	white->_position = glm::vec3(-0.15f, -0.3f, 0.0f);
 	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
 	black = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
 	black->createBufferObjects();
-	black->_position = glm::vec3(0.10f, -0.3f, 0.0f);
+	black->_position = glm::vec3(0.15f, -0.3f, 0.0f);
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
@@ -372,8 +355,7 @@ void createBufferObjects() {
 	checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
-void destroyBufferObjects()
-{
+void destroyBufferObjects() {
 	glDisableVertexAttribArray(VERTICES);
 	glDisableVertexAttribArray(COLORS);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -386,8 +368,7 @@ void destroyBufferObjects()
 
 /////////////////////////////////////////////////////////////////////// SCENE
 
-void drawScene()
-{
+void drawScene() {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	myCamera->lookAt();
@@ -405,7 +386,8 @@ void drawScene()
 	
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
+	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.0f, 1.0f, 2.0f, 7.0f)));
 	glViewport(640, 0, 260, 640);
 	
 	sb.draw();
@@ -439,16 +421,18 @@ void saveScene(std::string fileName) {
 			<< " " << (*it)->_angle << "\n";
 	}
 	myfile.close();
-	std::cout << ">>>>> SCENE SAVED <<<<<" << std::endl;
+	std::cout << "This scene has been saved." << std::endl;
 }
 
 void loadScene(std::string fileName) {
-	std::cout << "<<<<< LOADING SCENE >>>>>" << std::endl;
+	std::cout << "Loading scene..." << std::endl;
 	std::ifstream myfile(fileName);
 	std::string line;
 	
 	if (myfile.is_open()) {
+		//TODO deveriamos fazer algum metodo que reiniciasse tudo?!
 		ID = 1;
+		SelectedNode = NULL;
 		Scene->deleteAllNodes();
 		while (getline(myfile, line)) {
 			std::stringstream linestream(line);
@@ -465,13 +449,13 @@ void loadScene(std::string fileName) {
 			linestream >> color.b;
 			linestream >> color.a;
 			linestream >> angle;
-			SceneNode* node = createMesh(shape);
+			SceneNode* node = addNode(shape);
 			node->setPosition(position);
 			node->setColor(color);
 			node->setAngle(angle);
 		}
 		myfile.close();
-		std::cout << ">>>>> SCENE LOADED <<<<<" << std::endl;
+		std::cout << "This scene has been loaded." << std::endl;
 	} else {
 		std::cout << "Unable to open file";
 	}
@@ -485,14 +469,12 @@ void deleteSelected() {
 	}
 }
 
-void cleanup()
-{
+void cleanup() {
 	destroyShaderProgram();
 	destroyBufferObjects();
 }
 
-void display()
-{
+void display() {
 	++FrameCount;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glClearStencil(0);
@@ -500,20 +482,17 @@ void display()
 	glutSwapBuffers();
 }
 
-void idle()
-{
+void idle() {
 	glutPostRedisplay();
 }
 
-void reshape(int w, int h)
-{
+void reshape(int w, int h) {
 	WinX = w;
 	WinY = h;
 	glViewport(0, 0, WinX, WinY);
 }
 
-void timer(int value)
-{
+void timer(int value) {
 	std::ostringstream oss;
 	oss << CAPTION << ": " << FrameCount << " FPS @ (" << WinX << "x" << WinY << ")";
 	std::string s = oss.str();
@@ -533,19 +512,19 @@ void keyboard(unsigned char key, int x, int y) {
 		glutDestroyWindow(WindowHandle);
 		break;
 	case 'c':
-		createMesh(0);
+		addNode(0);
 		break;
 	case 'v':
-		createMesh(1);
+		addNode(1);
 		break;
 	case 'b':
-		createMesh(2);
+		addNode(2);
 		break;
 	case 'n':
-		createMesh(3);
+		addNode(3);
 		break;
 	case 'm':
-		createMesh(4);
+		addNode(4);
 		break;
 	case 'd':
 		Scene->deleteAllNodes();
@@ -669,7 +648,7 @@ void changeSidebarMeshColor() {
 }
 
 
-void meshSelector(GLfloat data) {
+void nodeSelector(GLfloat data) {
 	GLuint id = GLuint(data);
 
 	switch (id) {
@@ -683,8 +662,7 @@ void meshSelector(GLfloat data) {
 			SelectedNode = NULL;
 			canDrag=true;
 		}
-		createMesh(0);
-		SelectedNode = Scene->findNode(CurrentID);
+		SelectedNode = addNode(0);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -702,8 +680,7 @@ void meshSelector(GLfloat data) {
 			SelectedNode = NULL;
 			canDrag=true;
 		}
-		createMesh(2);
-		SelectedNode = Scene->findNode(CurrentID);
+		SelectedNode = addNode(2);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -721,8 +698,7 @@ void meshSelector(GLfloat data) {
 			SelectedNode = NULL;
 			canDrag=true;
 		}
-		createMesh(1);
-		SelectedNode = Scene->findNode(CurrentID);
+		SelectedNode = addNode(1);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -740,8 +716,7 @@ void meshSelector(GLfloat data) {
 			SelectedNode = NULL;
 			canDrag=true;
 		}
-		createMesh(4);
-		SelectedNode = Scene->findNode(CurrentID);
+		SelectedNode = addNode(4);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -759,8 +734,7 @@ void meshSelector(GLfloat data) {
 			SelectedNode = NULL;
 			canDrag=true;
 		}
-		createMesh(3);
-		SelectedNode = Scene->findNode(CurrentID);
+		SelectedNode = addNode(3);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.25;
@@ -802,8 +776,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 		if (state == GLUT_DOWN) {
 			MouseX = x;
 			MouseY = y;
-			lastMx=x;
-			lastMy=y;
+			lastMx = x;
+			lastMy = y;
 			GLfloat data;
 			glReadPixels(MouseX, WinY - MouseY - 1, 1, 1, GL_STENCIL_INDEX, GL_FLOAT, &data);
 
@@ -827,6 +801,19 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						SelectedNode = NULL;
 						canDrag = true;
 					}
+					else {
+						SceneNode* nextNode = Scene->findNode(GLint(data));
+						if (nextNode != NULL) {
+							glm::vec3 currentPosition = SelectedNode->_position;
+							currentPosition.y -= 0.25;
+							SelectedNode->setPosition(currentPosition);
+							
+							SelectedNode = nextNode;
+							 currentPosition = SelectedNode->_position;
+							currentPosition.y += 0.25;
+							SelectedNode->setPosition(currentPosition);
+						}
+					}
 				} else {
 					SelectedNode = Scene->findNode(GLint(data));
 					if (SelectedNode != NULL) {
@@ -835,13 +822,11 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						SelectedNode->setPosition(currentPosition);
 					}
 				}
-
-
-				meshSelector(data);
-
+				
+				nodeSelector(data);
 			}
 		}
-		if(state==GLUT_UP){
+		if (state == GLUT_UP){
 			myCamera->rotationAngleX=0.0f;
 			myCamera->rotationAngleY=0.0f;
 			//myCamera->setUpdateVMatrixFlag(false);
@@ -851,7 +836,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 	}
 }
 
-void mouseMotion(int x, int y){
+void mouseMotion(int x, int y) {
 
 	if (canDrag){
 		myCamera->rotationAngleY = (float)(x - lastMx);
@@ -868,8 +853,7 @@ void wheel(int button, int dir, int x, int y) {
 
 /////////////////////////////////////////////////////////////////////// SETUP
 
-void setupCallbacks() 
-{
+void setupCallbacks() {
 	glutCloseFunc(cleanup);
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
@@ -906,8 +890,7 @@ void setupGLEW() {
 	GLenum err_code = glGetError();
 }
 
-void setupGLUT(int argc, char* argv[])
-{
+void setupGLUT(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 	
 	glutInitContextVersion(3, 3);
@@ -925,12 +908,11 @@ void setupGLUT(int argc, char* argv[])
 	}
 }
 
-void init(int argc, char* argv[])
-{
+void init(int argc, char* argv[]) {
 	setupGLUT(argc, argv);
 	setupGLEW();
 	setupOpenGL();
-	initializeShapes();
+	initializeMeshes();
 	createShaderProgram();
 	createBufferObjects();
 	setupCallbacks();
@@ -939,13 +921,9 @@ void init(int argc, char* argv[])
 	createSidebar();
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
 	init(argc, argv);
-	glutMainLoop();	
+	glutMainLoop();
 	exit(EXIT_SUCCESS);
 }
-
-///////////////////////////////////////////////////////////////////////
-
 

@@ -21,13 +21,14 @@
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
 #define TEXTURE_PATH "../src/meshes/basalt2rough.png"
+#define NOISE_TEXTURE_PATH "../src/meshes/PerlinNoise.jpg"
 
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
 unsigned int FrameCount = 0;
 bool canDrag = false;
 
-GLuint VaoId, VboId[4], TextureId;
+GLuint VaoId, VboId[4], TextureId[2];
 GLint UboId, UniformId;
 const GLuint UBO_BP = 0;
 
@@ -327,15 +328,23 @@ void createSidebar() {
 }
 
 void createTextures() {
-	int width,height;
-	unsigned char* img = SOIL_load_image(TEXTURE_PATH, &width, &height, NULL, SOIL_LOAD_RGB);
-
-	glGenTextures(1, &TextureId);
-	glBindTexture(GL_TEXTURE_2D, TextureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+	int width1,height1,width2,height2;
+	
+	unsigned char* img1 = SOIL_load_image(TEXTURE_PATH, &width1, &height1, NULL, SOIL_LOAD_RGB);
+	unsigned char* img2 = SOIL_load_image(NOISE_TEXTURE_PATH, &width2, &height2, NULL, SOIL_LOAD_RGB);
+	
+	glGenTextures(2, TextureId);
+	
+	glBindTexture(GL_TEXTURE_2D, TextureId[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, img1);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glBindTexture(GL_TEXTURE_2D, TextureId[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, img2);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

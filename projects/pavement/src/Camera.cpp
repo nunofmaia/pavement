@@ -16,17 +16,17 @@ Camera::~Camera(void) {
 }
 
 void Camera::update(GLfloat rotX, GLfloat rotY){
-	/**/
+	/** /
 	//ONLY HORIZONTAL ROTATION
 	glm::quat q1 = glm::angleAxis(rotX, _yAxis);
 	glm::quat currentQ = (q1);
 	glm::mat4 mf = glm::mat4_cast(currentQ);
 		
-	/** /
+	/**/
 	//DEBUG ROTATION
-	glm::quat q1 = glm::angleAxis(rotY, _yAxis);
+	glm::quat q1 = glm::angleAxis(rotX, _yAxis);
 	glm::mat4 m1 = glm::mat4_cast(q1);
-	glm::quat q2 = glm::angleAxis(rotX, _xAxis);
+	glm::quat q2 = glm::angleAxis(rotY, _xAxis);
 	glm::mat4 m2 = glm::mat4_cast(q2);
 	glm::quat currentQ = (q1*q2);
 	glm::mat4 mf = glm::mat4_cast(currentQ);

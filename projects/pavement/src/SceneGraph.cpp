@@ -17,9 +17,10 @@ SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {
 
 	_textureLoaded = false;
 	_toRevert = false;
+	_isSelected = false;
 }
 
-SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuint textureId) {
+SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuint textureId[2]) {
 	_mesh = mesh;
 	_shader = shader;
 	_id = id;
@@ -30,8 +31,10 @@ SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader, GLuin
 	_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	
 	_textureLoaded = true;
-	_textureId = textureId;
+	_textureId[0] = textureId[0];
+	_textureId[1] = textureId[1];
 	_toRevert = false;
+	_isSelected = false;
 }
 
 SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
@@ -45,8 +48,10 @@ SceneNode::SceneNode(SceneNode* node, ShaderProgram* p) {
 	_scale = node->_scale;
 
 	_textureLoaded = node->_textureLoaded;
-	_textureId = node->_textureId;
+	_textureId[0] = node->_textureId[0];
+	_textureId[1] = node->_textureId[1];
 	_toRevert = false;
+	_isSelected = false;
 }
 
 
@@ -88,8 +93,9 @@ void SceneNode::createBufferObjects() {
 	if (_toRevert) {
 		std::reverse(v.begin(), v.end());
 		std::reverse(n.begin(), n.end());
-	} else {
 		std::reverse(t.begin(), t.end());
+	} else {
+		//std::reverse(t.begin(), t.end());
 	}
 
 
@@ -140,11 +146,18 @@ void SceneNode::draw() {
 
 		if (_textureLoaded) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, _textureId);
+			glBindTexture(GL_TEXTURE_2D, _textureId[0]);
 			GLint uniform_mytexture = glGetUniformLocation(_shader->getProgramId(), "texture_uniform");
 			glUniform1i(uniform_mytexture, /*GL_TEXTURE*/0);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, _textureId[1]);
+			uniform_mytexture = glGetUniformLocation(_shader->getProgramId(), "noise_texture_uniform");
+			glUniform1i(uniform_mytexture, /*GL_TEXTURE*/1);
 		}
-	
+		
+
+
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilFunc(GL_ALWAYS, _id, 0xFF);
@@ -161,6 +174,50 @@ void SceneNode::draw() {
 		}
 	}
 }
+
+void SceneNode::drawTransparencies() {
+	if(_canDraw && _isSelected) {
+
+		float yPos = _position.y;
+		glm::vec4 originalColor = _color;
+
+		_position.y = 0.125f;
+		_color = glm::vec4(0.9f, 0.33f, 0.05f, 0.75f);
+
+		if (_shader != NULL) {
+			_shader->useShaderProgram();
+			_shader->setUniform("ModelMatrix", glm::scale(glm::translate(glm::mat4(1.0), _position), _scale));
+			_shader->setUniform("DefaultColor", _color);
+			_shader->setUniform("Angle", _angle);
+		}
+
+		_position.y = yPos;
+		_color = originalColor;
+
+		if (_textureLoaded) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _textureId[0]);
+			GLint uniform_mytexture = glGetUniformLocation(_shader->getProgramId(), "texture_uniform");
+			glUniform1i(uniform_mytexture, /*GL_TEXTURE*/0);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, _textureId[1]);
+			uniform_mytexture = glGetUniformLocation(_shader->getProgramId(), "noise_texture_uniform");
+			glUniform1i(uniform_mytexture, /*GL_TEXTURE*/1);
+		}
+
+		glBindVertexArray(VaoId);
+		glEnable (GL_BLEND);
+
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		_mesh->draw();
+
+		glDisable(GL_BLEND);
+		glBindVertexArray(0);
+
+	}
+}
+
 
 void SceneNode::addCopy(SceneNode* copy) {
 	_copies.push_back(copy);
@@ -195,6 +252,14 @@ SceneGraph::~SceneGraph() {
 void SceneGraph::draw() {
 	for (std::vector<SceneNode*>::iterator it = _nodes.begin(); it != _nodes.end(); ++it) {
 		(*it)->draw();
+	}
+
+	drawTransparencies();
+}
+
+void SceneGraph::drawTransparencies() {
+	for (std::vector<SceneNode*>::iterator it = _nodes.begin(); it != _nodes.end(); ++it) {
+		(*it)->drawTransparencies();
 	}
 }
 

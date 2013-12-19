@@ -18,18 +18,19 @@ struct SceneNode {
 	glm::vec4 _color;
 	GLfloat _angle;
 	glm::vec3 _scale;
-	bool _canDraw, _textureLoaded, _toRevert;
-	GLuint _textureId;
+	bool _canDraw, _textureLoaded, _toRevert, _isSelected;
+	GLuint _textureId[2];
 
 	SceneNode();
 	SceneNode(int, int, Mesh*, ShaderProgram*);
-	SceneNode(int, int, Mesh*, ShaderProgram*, GLuint);
+	SceneNode(int, int, Mesh*, ShaderProgram*, GLuint*);
 	SceneNode(SceneNode*, ShaderProgram*);
 	~SceneNode();
 	void setColor(glm::vec4);
 	void setPosition(glm::vec3);
 	void setAngle(GLfloat);
 	void draw();
+	void drawTransparencies();
 	void createBufferObjects();
 	void addCopy(SceneNode*);
 	void hideCopies(ShaderProgram*);
@@ -44,6 +45,7 @@ struct SceneGraph {
 	SceneGraph();
 	~SceneGraph();
 	void draw();
+	void drawTransparencies();
 	void addNode(SceneNode*);
 	void hideSolids(ShaderProgram*);
 	void showSolids(ShaderProgram*);

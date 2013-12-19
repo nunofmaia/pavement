@@ -6,44 +6,55 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 #include "Utils.h"
-#include <vector>
-#include <string>
-#include <sstream> 
 #include "Engine.h"
 
-class Camera
-{
+class Camera {
 public:
-	glm::mat4 viewMatrix, mainViewMatrix;
-	glm::vec3 eyeVector,centerVector,upVector,yAxis,xAxis;
-	GLfloat rotationAngleX,rotationAngleY, k;
-	glm::quat mainQ, currentQ;
-	int windowX,windowY;
-	bool updateVMatrixFlag;
-	bool restartViewMatrixFlag;
-	int switchMode;
-	GLfloat zoomFactor;
+	class Mode {
+	protected:
+		glm::mat4 _projection;
+		GLfloat _zoomFactor, _near, _far;
+		Mode(GLfloat, GLfloat, GLfloat);
+	public:
+		glm::mat4 getProjection();
+		virtual void updateProjection() {}
+		void zoomIn();
+		void zoomOut();
+	};
+	class Perspective : public Camera::Mode {
+		GLfloat _fovY, _aspect;
+	public:
+		Perspective(GLfloat, GLfloat, GLfloat, GLfloat);
+		void updateProjection();
+	};
+	class Ortho : public Camera::Mode {
+		GLfloat _left, _right, _bottom, _top;
+	public:
+		Ortho(GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
+		void updateProjection();
+	};
+
+private:
+	glm::mat4 _viewMatrix;
+	glm::vec3 _xAxis, _yAxis;
+	Mode *_projectionMode;
+
+public:
 
 	Camera(void);
-	Camera(glm::vec3,glm::vec3,glm::vec3);
+	Camera(glm::vec3, glm::vec3, glm::vec3, Camera::Mode*);
 	~Camera(void);
 	
-	glm::mat4 getViewMatrix();
-	void setViewMatrix(glm::mat4 matrix);
-	void setUpdateVMatrixFlag(bool);
-	void updateViewMatrix();
-	void setViewMatrix();
+	void update(GLfloat, GLfloat);
 	void cleanViewProjectionMatrix();
 	void lookAt();
 	void zoom(int);
 	
-	void orthographic(GLfloat,GLfloat,GLfloat,GLfloat,GLfloat,GLfloat);
-	void perspective(GLfloat,GLfloat,GLfloat,GLfloat);
-	void viewMode();
-	
-	void restartCamera();
+	void orthographic(GLfloat, GLfloat, GLfloat,GLfloat,GLfloat,GLfloat);
+	void perspective(GLfloat, GLfloat, GLfloat,GLfloat);
+	void project();
 
-	//GLfloat t,b,r,l,n,f;
 };
+
 
 #endif

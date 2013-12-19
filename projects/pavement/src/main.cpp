@@ -43,7 +43,7 @@ MeshManager *Manager = new MeshManager();
 
 std::stack<int> AvailableIds;
 
-Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Perspective(30.0f, (GLfloat) WinX / WinY, 2.0f, 20.0f));
 Grid grid(20);
 Sidebar sb;
 
@@ -370,10 +370,8 @@ void destroyBufferObjects() {
 
 void drawScene() {
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
-	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	myCamera->lookAt();
-	myCamera->viewMode();
-	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Matrix), sizeof(Matrix), ProjectionMatrix2);
+	myCamera->project();
 
 	glViewport(0, 0, 640, 640);
 
@@ -827,10 +825,8 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			}
 		}
 		if (state == GLUT_UP){
-			myCamera->rotationAngleX=0.0f;
-			myCamera->rotationAngleY=0.0f;
-			//myCamera->setUpdateVMatrixFlag(false);
-			canDrag=false;
+			myCamera->update(0.0f, 0.0f);
+			canDrag = false;
 		}
 		break;
 	}
@@ -839,9 +835,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 void mouseMotion(int x, int y) {
 
 	if (canDrag){
-		myCamera->rotationAngleY = (float)(x - lastMx);
-		myCamera->rotationAngleX = (float)(y - lastMy);
-		myCamera->setUpdateVMatrixFlag(true);
+		myCamera->update((GLfloat)(x - lastMx), (GLfloat)(y - lastMy));
 		lastMx = x;
 		lastMy = y; 
 	}

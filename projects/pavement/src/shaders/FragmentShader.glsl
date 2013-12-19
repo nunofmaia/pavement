@@ -68,7 +68,7 @@ void main(void) {
 	//vec3 normal = normalize(n);
 	vec3 normal = n;
 	vec3 eye = vec3(0.0, 5.0, 5.0);
-	vec3 lightSource = vec3(0.0, 5.0, 0.0);
+	vec3 lightSource = vec3(0.0, 5.0, 3.0);
 	//vec4 diffuseLight = vec4(0.9, 0.9, 0.9, 1.0);
 	vec4 diffuseLight = ex_Color;
 

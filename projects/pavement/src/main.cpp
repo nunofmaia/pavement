@@ -379,7 +379,21 @@ void destroyBufferObjects() {
 /////////////////////////////////////////////////////////////////////// SCENE
 
 void drawScene() {
+
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
+
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
+
+	glViewport(640, 0, 260, 640);
+	
+	sb.draw();
+
+	white->draw();
+	black->draw();
+
 	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix), glm::value_ptr(glm::lookAt(glm::vec3(LAX, 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
 	myCamera->lookAt();
 	myCamera->viewMode();
@@ -387,23 +401,13 @@ void drawScene() {
 
 	glViewport(0, 0, 640, 640);
 
-	Scene->draw();
 
 	GridShader->useShaderProgram();
 
 	GridShader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	grid.drawGrid();
-	
-	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
-	glViewport(640, 0, 260, 640);
-	
-	sb.draw();
 
-	white->draw();
-	black->draw();
+	Scene->draw();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glUseProgram(0); //TODO: Use ShaderProgram
@@ -672,7 +676,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y -= 0.25;
+			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
@@ -681,9 +685,10 @@ void nodeSelector(GLfloat data) {
 		SelectedNode = addNode(0);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y += 0.25;
+			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			SelectedNode->_isSelected = true;
 
 			canDrag = false;
 		}
@@ -692,7 +697,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Prism" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y -= 0.25;
+			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
@@ -701,9 +706,10 @@ void nodeSelector(GLfloat data) {
 		SelectedNode = addNode(2);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y += 0.25;
+			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
@@ -711,7 +717,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Half cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y -= 0.25;
+			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
@@ -720,9 +726,10 @@ void nodeSelector(GLfloat data) {
 		SelectedNode = addNode(1);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y += 0.25;
+			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
@@ -730,7 +737,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Quarter cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y -= 0.25;
+			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
@@ -739,9 +746,10 @@ void nodeSelector(GLfloat data) {
 		SelectedNode = addNode(4);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y += 0.25;
+			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
@@ -749,7 +757,7 @@ void nodeSelector(GLfloat data) {
 		std::cout << "Half prism" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y -= 0.25;
+			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
@@ -758,9 +766,10 @@ void nodeSelector(GLfloat data) {
 		SelectedNode = addNode(3);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.y += 0.25;
+			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
 			SelectedNode->setColor(Color);
+			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
@@ -810,8 +819,9 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			if (data == 0) {
 				if (SelectedNode != NULL) {
 					glm::vec3 currentPosition = SelectedNode->_position;
-					currentPosition.y -= 0.25;
+					currentPosition.y -= 0.35f;
 					SelectedNode->setPosition(currentPosition);
+					SelectedNode->_isSelected = false;
 				}
 
 				SelectedNode = NULL;
@@ -822,13 +832,14 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						SceneNode* nextNode = Scene->findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;
-							currentPosition.y -= 0.25;
+							currentPosition.y -= 0.35f;
 							SelectedNode->setPosition(currentPosition);
 							
 							SelectedNode = nextNode;
 							 currentPosition = SelectedNode->_position;
-							currentPosition.y += 0.25;
+							currentPosition.y += 0.35f;
 							SelectedNode->setPosition(currentPosition);
+							SelectedNode->_isSelected = true;
 
 							canDrag = false;
 						}
@@ -837,8 +848,9 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 					SelectedNode = Scene->findNode(GLint(data));
 					if (SelectedNode != NULL) {
 						glm::vec3 currentPosition = SelectedNode->_position;
-						currentPosition.y += 0.25;
+						currentPosition.y += 0.35f;
 						SelectedNode->setPosition(currentPosition);
+						SelectedNode->_isSelected = true;
 
 						canDrag = false;
 					}
@@ -872,28 +884,28 @@ void mouseMotion(int x, int y) {
 		int diffX = x - DragX;
 		int diffY = y - DragY;
 
-		if (diffX > 40) {
+		if (diffX > 20) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.x += 0.25;
+			currentPosition.x += 0.125;
 			SelectedNode->setPosition(currentPosition);
 			DragX = x;
 
-		} else if (diffX < -40) {
+		} else if (diffX < -20) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.x -= 0.25;
+			currentPosition.x -= 0.125;
 			SelectedNode->setPosition(currentPosition);
 			DragX = x;
 		}
 
-		if (diffY > 40) {
+		if (diffY > 20) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.z += 0.25;
+			currentPosition.z += 0.125;
 			SelectedNode->setPosition(currentPosition);
 			DragY = y;
 
-		} else if (diffY < -40) {
+		} else if (diffY < -20) {
 			glm::vec3 currentPosition = SelectedNode->_position;
-			currentPosition.z -= 0.25;
+			currentPosition.z -= 0.125;
 			SelectedNode->setPosition(currentPosition);
 			DragY = y;
 		}

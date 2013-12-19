@@ -827,6 +827,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			} else {
 				if (SelectedNode != NULL) {
 					if (data != SelectedNode->_id) {
+						SelectedNode->_isSelected = false;
 						SceneNode* nextNode = Scene->findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;

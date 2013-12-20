@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <stack>
+#include <direct.h>
 
 #include "Engine.h"
 #include "Shader.h"
@@ -17,8 +18,8 @@
 #define VERTEX_SHADER_FILE "../src/shaders/VertexShader.glsl"
 #define FRAGMENT_SHADER_FILE "../src/shaders/FragmentShader.glsl"
 #define MESH_PATH "../src/meshes/"
-#define TEXTURE_PATH "../src/meshes/basalt2.png"
-#define NOISE_TEXTURE_PATH "../src/meshes/PerlinNoise.jpg"
+#define TEXTURE_PATH "../src/textures/basalt2.png"
+#define NOISE_TEXTURE_PATH "../src/textures/PerlinNoise.jpg"
 #define SCENES_PATH "../src/scenes/"
 
 int WinX = 900, WinY = 640;
@@ -381,8 +382,12 @@ void drawScene() {
 
 void saveScene(std::string fileName) {
 	std::ofstream myfile;
+
+	_mkdir(SCENES_PATH);
+
 	myfile.open (fileName);
 	std::vector<SceneNode*>::iterator it;
+
 
 	for (it = DrawingZone->getScene()->_nodes.begin(); it != DrawingZone->getScene()->_nodes.end(); ++it) {
 		myfile << (*it)->_shape

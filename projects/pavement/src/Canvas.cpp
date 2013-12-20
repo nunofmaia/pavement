@@ -1,21 +1,17 @@
-#include "Grid.h"
+#include "Canvas.h"
 
-Grid::Grid() {
-
-}
-
-Grid::Grid(int lines) {
+Canvas::Canvas() {
 	_camera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Perspective(30.0f, 1.0f, 2.0f, 20.0f));
-	_linesNr = lines;
+	_linesNr = 40;
 	_interval = 0.25f;
 	generateGrid();
 }
 
-Grid::~Grid() {
+Canvas::~Canvas() {
 
 }
 
-void Grid::generateGrid() {
+void Canvas::generateGrid() {
 	glm::vec4 startVerticalPoint(0.0, 0.0, -5.0, 1.0);
 	glm::vec4 endVerticalPoint(0.0, 0.0, 5.0, 1.0);
 	glm::vec4 startHorizontalPoint(-5.0, 0.0, 0.0, 1.0);
@@ -49,7 +45,7 @@ void Grid::generateGrid() {
 	}
 }
 
-void Grid::highlightGrid(int n) {
+void Canvas::highlightGrid(int n) {
 	switch(n){
 	case 0:
 		_lineColors[0] = glm::vec4(0.5, 0.5, 0.5, 1.0);
@@ -86,7 +82,7 @@ void Grid::highlightGrid(int n) {
 	createBufferObjects();
 }
 
-void Grid::createBufferObjects() {
+void Canvas::createBufferObjects() {
 	glGenVertexArrays(1, &VaoId);
 	glBindVertexArray(VaoId);
 
@@ -109,7 +105,7 @@ void Grid::createBufferObjects() {
 	//checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
-void Grid::draw() {
+void Canvas::draw() {
 	_camera->lookAt();
 	_camera->project();
 
@@ -120,14 +116,14 @@ void Grid::draw() {
 	_scene.draw();
 }
 
-void Grid::addNode(SceneNode* n) {
+void Canvas::addNode(SceneNode* n) {
 	_scene.addNode(n);
 }
 
-SceneGraph* Grid::getScene() {
+SceneGraph* Canvas::getScene() {
 	return &_scene;
 }
 
-Camera* Grid::getCamera() {
+Camera* Canvas::getCamera() {
 	return _camera;
 }

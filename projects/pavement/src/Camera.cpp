@@ -58,6 +58,7 @@ Camera::Mode::Mode(GLfloat zoomFactor, GLfloat n, GLfloat f) :
 	_zoomFactor(zoomFactor),
 	_near(n),
 	_far(f) {
+
 }
 
 glm::mat4 Camera::Mode::getProjection() {

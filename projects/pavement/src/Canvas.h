@@ -1,5 +1,5 @@
-#ifndef GRID_H
-#define GRID_H
+#ifndef CANVAS_H
+#define CANVAS_H
 
 #include <vector>
 
@@ -7,11 +7,10 @@
 #include "Camera.h"
 #include "SceneGraph.h"
 
-class Grid {
+class Canvas {
 public:
-	Grid();
-	Grid(int);
-	~Grid();
+	Canvas();
+	~Canvas();
 
 	void createBufferObjects();
 	void generateGrid();

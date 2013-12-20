@@ -10,7 +10,7 @@
 
 #include "Engine.h"
 #include "Shader.h"
-#include "Grid.h"
+#include "Canvas.h"
 #include "Sidebar.h"
 
 #define CAPTION "Pedras e Calcada"
@@ -41,7 +41,7 @@ MeshManager *Manager = new MeshManager();
 
 std::stack<int> AvailableIds;
 
-Grid *DrawingZone = new Grid(40);
+Canvas *DrawingZone = new Canvas();
 Sidebar *EditZone = new Sidebar();
 
 
@@ -67,7 +67,6 @@ void initializeMeshes() {
 	Manager->addMesh(2, new Mesh("../src/meshes/prism.obj"));
 	Manager->addMesh(3, new Mesh("../src/meshes/halfPrism.obj"));
 	Manager->addMesh(4, new Mesh("../src/meshes/quarterCube.obj"));
-	Manager->addMesh(5, new Mesh("../src/meshes/smooth_sphere.obj"));
 }
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -606,6 +605,7 @@ void nodeSelector(GLfloat data) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
+			SelectedNode->_isSelected = false;
 
 			SelectedNode = NULL;
 		}
@@ -625,6 +625,7 @@ void nodeSelector(GLfloat data) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
+			SelectedNode->_isSelected = false;
 
 			SelectedNode = NULL;
 		}
@@ -643,6 +644,7 @@ void nodeSelector(GLfloat data) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
+			SelectedNode->_isSelected = false;
 
 			SelectedNode = NULL;
 		}
@@ -661,6 +663,7 @@ void nodeSelector(GLfloat data) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
+			SelectedNode->_isSelected = false;
 
 			SelectedNode = NULL;
 		}
@@ -679,6 +682,7 @@ void nodeSelector(GLfloat data) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
+			SelectedNode->_isSelected = false;
 
 			SelectedNode = NULL;
 		}

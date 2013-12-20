@@ -11,7 +11,8 @@
 #include <sstream> 
 #include <map>
 
-#include "soil\src\SOIL.h"
+#include "soil/src/SOIL.h"
+
 #include "Engine.h"
 
 struct Mesh {

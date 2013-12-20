@@ -21,12 +21,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\FragmentShader.glsl" />
-    <None Include="..\src\shaders\GridFragmentShader.glsl" />
-    <None Include="..\src\shaders\GridVertexShader.glsl" />
+    <None Include="..\src\shaders\SimpleFragmentShader.glsl" />
+    <None Include="..\src\shaders\SimpleVertexShader.glsl" />
     <None Include="..\src\shaders\ReflectionXShader.glsl" />
     <None Include="..\src\shaders\ReflectionOShader.glsl" />
     <None Include="..\src\shaders\ReflectionZShader.glsl" />
-    <None Include="..\src\shaders\SidebarFragmentShader.glsl" />
     <None Include="..\src\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>

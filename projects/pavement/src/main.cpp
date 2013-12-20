@@ -36,15 +36,14 @@ ShaderProgram *Shader;
 ShaderProgram *ReflectionX;
 ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
-ShaderProgram *GridShader;
-ShaderProgram *SidebarShader;
+ShaderProgram *SimpleShader;
 
 SceneGraph *Scene = new SceneGraph();
 MeshManager *Manager = new MeshManager();
 
 std::stack<int> AvailableIds;
 
-Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Perspective(30.0f, (GLfloat) WinX / WinY, 2.0f, 20.0f));
+Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Perspective(30.0f, 1.0f, 2.0f, 20.0f));
 Grid grid(20);
 Sidebar sb;
 
@@ -216,32 +215,17 @@ void createShaderProgram() {
 	UboId = glGetUniformBlockIndex(ReflectionO->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
 	glUniformBlockBinding(ReflectionO->getProgramId(), UboId, UBO_BP);
 
-	GridShader = new ShaderProgram();
+	SimpleShader = new ShaderProgram();
 
-	GridShader->setProgramId();
-	GridShader->addShaderFromFile("../src/shaders/GridVertexShader.glsl", GL_VERTEX_SHADER);
-	GridShader->addShaderFromFile("../src/shaders/GridFragmentShader.glsl", GL_FRAGMENT_SHADER);
-	GridShader->bindAttribLocation(VERTICES, "in_Position");
-	GridShader->bindAttribLocation(COLORS, "in_Color");
-	GridShader->bindAttribLocation(NORMALS, "in_Normal");
-	GridShader->linkShaderProgram();
+	SimpleShader->setProgramId();
+	SimpleShader->addShaderFromFile("../src/shaders/SimpleVertexShader.glsl", GL_VERTEX_SHADER);
+	SimpleShader->addShaderFromFile("../src/shaders/SimpleFragmentShader.glsl", GL_FRAGMENT_SHADER);
+	SimpleShader->bindAttribLocation(VERTICES, "in_Position");
+	SimpleShader->bindAttribLocation(COLORS, "in_Color");
+	SimpleShader->linkShaderProgram();
 
-	UboId = glGetUniformBlockIndex(GridShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
-	glUniformBlockBinding(GridShader->getProgramId(), UboId, UBO_BP);
-
-	SidebarShader = new ShaderProgram();
-
-	SidebarShader->setProgramId();
-	SidebarShader->addShaderFromFile("../src/shaders/VertexShader.glsl", GL_VERTEX_SHADER);
-	SidebarShader->addShaderFromFile("../src/shaders/SidebarFragmentShader.glsl", GL_FRAGMENT_SHADER);
-	SidebarShader->bindAttribLocation(VERTICES, "in_Position");
-	SidebarShader->bindAttribLocation(COLORS, "in_Color");
-	SidebarShader->bindAttribLocation(NORMALS, "in_Normal");
-	ReflectionO->bindAttribLocation(TEXTURES, "in_Texcoord");
-	SidebarShader->linkShaderProgram();
-
-	UboId = glGetUniformBlockIndex(SidebarShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
-	glUniformBlockBinding(SidebarShader->getProgramId(), UboId, UBO_BP);
+	UboId = glGetUniformBlockIndex(SimpleShader->getProgramId(), "SharedMatrices"); //TODO: Use ShaderProgram
+	glUniformBlockBinding(SimpleShader->getProgramId(), UboId, UBO_BP);
 	
 	checkOpenGLError("ERROR: Could not create shaders.");
 }
@@ -253,8 +237,7 @@ void destroyShaderProgram() {
 	delete(ReflectionX);
 	delete(ReflectionZ);
 	delete(ReflectionO);
-	delete(GridShader);
-	delete(SidebarShader);
+	delete(SimpleShader);
 
 	checkOpenGLError("ERROR: Could not destroy shaders.");
 }
@@ -268,7 +251,7 @@ void createSidebar() {
 	int id = 240;
 
 	Mesh *sq = new Mesh("../src/meshes/sidebar/cube.obj");
-	SceneNode *sqn = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	SceneNode *sqn = new SceneNode(id++, 0, sq, Shader, TextureId);
 	sqn->createBufferObjects();
 	sqn->_position = glm::vec3(-0.15f, 1.2f, 0.0f);
 	sqn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
@@ -276,7 +259,7 @@ void createSidebar() {
 	sqn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *pr = new Mesh("../src/meshes/sidebar/prism.obj");
-	SceneNode *prn = new SceneNode(id++, 2, pr, SidebarShader, TextureId);
+	SceneNode *prn = new SceneNode(id++, 2, pr, Shader, TextureId);
 	prn->createBufferObjects();
 	prn->_position = glm::vec3(0.15f, 1.2f, 0.0f);
 	prn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
@@ -284,7 +267,7 @@ void createSidebar() {
 	prn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *hs = new Mesh("../src/meshes/sidebar/halfCube.obj");
-	SceneNode *hsn = new SceneNode(id++, 1, hs, SidebarShader, TextureId);
+	SceneNode *hsn = new SceneNode(id++, 1, hs, Shader, TextureId);
 	hsn->createBufferObjects();
 	hsn->_position = glm::vec3(-0.15f, 0.6f, 0.0f);
 	hsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
@@ -292,7 +275,7 @@ void createSidebar() {
 	hsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *qs = new Mesh("../src/meshes/sidebar/quarterCube.obj");
-	SceneNode *qsn = new SceneNode(id++, 4, qs, SidebarShader, TextureId);
+	SceneNode *qsn = new SceneNode(id++, 4, qs, Shader, TextureId);
 	qsn->createBufferObjects();
 	qsn->_position = glm::vec3(-0.15f, 0.0f, 0.0f);
 	qsn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
@@ -300,7 +283,7 @@ void createSidebar() {
 	qsn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *lpr = new Mesh("../src/meshes/sidebar/halfPrism.obj");
-	SceneNode *lprn = new SceneNode(id++, 3, lpr, SidebarShader, TextureId);
+	SceneNode *lprn = new SceneNode(id++, 3, lpr, Shader, TextureId);
 	lprn->createBufferObjects();
 	lprn->_position = glm::vec3(0.15f, 0.6f, 0.0f);
 	lprn->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
@@ -308,14 +291,14 @@ void createSidebar() {
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
-	white = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	white = new SceneNode(id++, 0, sq, Shader, TextureId);
 	white->createBufferObjects();
 	white->_position = glm::vec3(-0.15f, -0.6f, 0.0f);
 	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
 	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
-	black = new SceneNode(id++, 0, sq, SidebarShader, TextureId);
+	black = new SceneNode(id++, 0, sq, Shader, TextureId);
 	black->createBufferObjects();
 	black->_position = glm::vec3(0.15f, -0.6f, 0.0f);
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -382,30 +365,31 @@ void drawScene() {
 
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 
-	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::perspective(30.0f, 260/640.0f, 2.0f, 20.0f)));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
-
-	glViewport(640, 0, 260, 640);
-	
-	sb.draw();
-
-	white->draw();
-	black->draw();
-
 	myCamera->lookAt();
 	myCamera->project();
 
 	glViewport(0, 0, 640, 640);
 
 
-	GridShader->useShaderProgram();
+	SimpleShader->useShaderProgram();
 
-	GridShader->setUniform("ModelMatrix", glm::mat4(1.0f));
 	grid.drawGrid();
 
 	Scene->draw();
+
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
+
+	glViewport(640, 0, 260, 640);
+	
+	SimpleShader->useShaderProgram();
+
+	sb.draw();
+
+	white->draw();
+	black->draw();
+
+
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glUseProgram(0); //TODO: Use ShaderProgram

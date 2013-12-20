@@ -53,12 +53,6 @@
     <None Include="..\src\shaders\FragmentShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
-    <None Include="..\src\shaders\GridFragmentShader.glsl">
-      <Filter>Shaders Files</Filter>
-    </None>
-    <None Include="..\src\shaders\GridVertexShader.glsl">
-      <Filter>Shaders Files</Filter>
-    </None>
     <None Include="..\src\shaders\ReflectionXShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
@@ -68,7 +62,10 @@
     <None Include="..\src\shaders\ReflectionOShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
-    <None Include="..\src\shaders\SidebarFragmentShader.glsl">
+    <None Include="..\src\shaders\SimpleFragmentShader.glsl">
+      <Filter>Shaders Files</Filter>
+    </None>
+    <None Include="..\src\shaders\SimpleVertexShader.glsl">
       <Filter>Shaders Files</Filter>
     </None>
   </ItemGroup>

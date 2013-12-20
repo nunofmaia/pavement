@@ -1,35 +1,36 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "GL/glew.h"
-#include "GL/freeglut.h"
-#include "Utils.h"
 #include <vector>
-#include <string>
-#include <sstream> 
+
 #include "Engine.h"
+#include "Camera.h"
+#include "SceneGraph.h"
 
-
-class Grid
-{
+class Grid {
 public:
+	Grid();
 	Grid(int);
-	Grid(int, GLfloat);
-	~Grid(void);
+	~Grid();
 
 	void createBufferObjects();
-	void setNlines(int);
 	void generateGrid();
-	void drawGrid();
+	void draw();
 	void highlightGrid(int);
+	
+	void addNode(SceneNode*);
+	SceneGraph getScene();
+	Camera* getCamera();
+
 private:
-	int _lines;
+	int _linesNr;
 	GLfloat _interval;
 	GLuint VaoId, VboId[4];
-	std::vector< glm::vec4 > lines;
-	std::vector< glm::vec4 > line_colors;
+	std::vector<glm::vec4> _lines;
+	std::vector<glm::vec4> _lineColors;
+
+	SceneGraph _scene;
+	Camera *_camera;
 };
 
 #endif

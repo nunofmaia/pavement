@@ -3,12 +3,8 @@
 
 #include <vector>
 
-#include "GL/glew.h"
-#include "GL/freeglut.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-
-#include "Mesh.h"
+#include "Engine.h"
+#include "Camera.h"
 #include "SceneGraph.h"
 
 class Sidebar {
@@ -20,8 +16,7 @@ class Sidebar {
 	std::vector<glm::vec4> _colors;
 
 	SceneGraph _scene;
-
-	
+	Camera *_camera;
 
 public:
 

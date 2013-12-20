@@ -1,7 +1,7 @@
 #include "Sidebar.h"
 
 Sidebar::Sidebar() {
-
+	_camera = new Camera(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f));
 }
 
 Sidebar::~Sidebar() {
@@ -53,10 +53,10 @@ SceneGraph Sidebar::getScene() {
 	return _scene;
 }
 
-
-
-
 void Sidebar::draw() {
+	_camera->lookAt();
+	_camera->project();
+
 	glBindVertexArray(VaoId);
 	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 	glBindVertexArray(0);

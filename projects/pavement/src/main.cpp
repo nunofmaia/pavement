@@ -9,10 +9,7 @@
 
 #include "Engine.h"
 #include "Shader.h"
-#include "Mesh.h"
 #include "Grid.h"
-#include "Camera.h"
-#include "SceneGraph.h"
 #include "Sidebar.h"
 
 #define CAPTION "Pedras e Calcada"
@@ -38,14 +35,12 @@ ShaderProgram *ReflectionZ;
 ShaderProgram *ReflectionO;
 ShaderProgram *SimpleShader;
 
-SceneGraph *Scene = new SceneGraph();
 MeshManager *Manager = new MeshManager();
 
 std::stack<int> AvailableIds;
 
-Camera *myCamera = new Camera(glm::vec3(0.0 , 5.0, 5.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0), new Camera::Perspective(30.0f, 1.0f, 2.0f, 20.0f));
-Grid grid(20);
-Sidebar sb;
+Grid *DrawingZone = new Grid(40);
+Sidebar *EditZone = new Sidebar();
 
 
 int ID = 1;
@@ -131,7 +126,7 @@ SceneNode* addNode(int shape) {
 	n->addCopy(nX);
 	n->addCopy(nZ);
 	n->addCopy(nO);
-	Scene->addNode(n);
+	DrawingZone->addNode(n);
 
 	switch (SymMode) {
 	case SymmetryMode::NONE:
@@ -304,11 +299,11 @@ void createSidebar() {
 	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	sb.addNode(sqn);
-	sb.addNode(prn);
-	sb.addNode(hsn);
-	sb.addNode(qsn);
-	sb.addNode(lprn);
+	EditZone->addNode(sqn);
+	EditZone->addNode(prn);
+	EditZone->addNode(hsn);
+	EditZone->addNode(qsn);
+	EditZone->addNode(lprn);
 }
 
 void createTextures() {
@@ -336,8 +331,8 @@ void createTextures() {
 void createBufferObjects() {
 	glGenBuffers(1, VboId);
 
-	grid.createBufferObjects();
-	sb.createBufferObjects();
+	DrawingZone->createBufferObjects();
+	EditZone->createBufferObjects();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, 0, GL_STREAM_DRAW);
@@ -365,31 +360,18 @@ void drawScene() {
 
 	glBindBuffer(GL_UNIFORM_BUFFER, VboId[0]);
 
-	myCamera->lookAt();
-	myCamera->project();
 
 	glViewport(0, 0, 640, 640);
-
-
 	SimpleShader->useShaderProgram();
-
-	grid.drawGrid();
-
-	Scene->draw();
-
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::lookAt(glm::vec3(0.0 , 1.5, 3.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0))));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::ortho(-0.5f, 0.5f, -1.5f, 1.5f, 2.0f, 7.0f)));
+	DrawingZone->draw();
 
 	glViewport(640, 0, 260, 640);
-	
 	SimpleShader->useShaderProgram();
-
-	sb.draw();
+	EditZone->draw();
 
 	white->draw();
 	black->draw();
-
-
+	
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glUseProgram(0); //TODO: Use ShaderProgram
@@ -405,7 +387,7 @@ void saveScene(std::string fileName) {
 	myfile.open (fileName);
 	std::vector<SceneNode*>::iterator it;
 
-	for (it = Scene->_nodes.begin(); it != Scene->_nodes.end(); ++it) {
+	for (it = DrawingZone->getScene()._nodes.begin(); it != DrawingZone->getScene()._nodes.end(); ++it) {
 		myfile << (*it)->_shape
 			<< " " << (*it)->_position.x
 			<< " " << (*it)->_position.y
@@ -429,7 +411,7 @@ void loadScene(std::string fileName) {
 		//TODO deveriamos fazer algum metodo que reiniciasse tudo?!
 		ID = 1;
 		SelectedNode = NULL;
-		Scene->deleteAllNodes();
+		DrawingZone->getScene().deleteAllNodes();
 		while (getline(myfile, line)) {
 			std::stringstream linestream(line);
 			int shape;
@@ -460,7 +442,7 @@ void loadScene(std::string fileName) {
 void deleteSelected() {
 	if (SelectedNode != NULL) {
 		AvailableIds.push(SelectedNode->_id);
-		Scene->deleteNode(SelectedNode);
+		DrawingZone->getScene().deleteNode(SelectedNode);
 		SelectedNode = NULL;
 	}
 }
@@ -526,7 +508,7 @@ void keyboard(unsigned char key, int x, int y) {
 		addNode(5);
 		break;
 	case 'd':
-		Scene->deleteAllNodes();
+		DrawingZone->getScene().deleteAllNodes();
 		ID = 1;
 		break;
 	//backspace key has an ascii number
@@ -561,39 +543,39 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
-		Scene->hideSolids(ReflectionX);
-		Scene->hideSolids(ReflectionZ);
-		Scene->hideSolids(ReflectionO);
-		grid.highlightGrid(0);
+		DrawingZone->getScene().hideSolids(ReflectionX);
+		DrawingZone->getScene().hideSolids(ReflectionZ);
+		DrawingZone->getScene().hideSolids(ReflectionO);
+		DrawingZone->highlightGrid(0);
 		break;
 	case '1':
 		SymMode = SymmetryMode::XAXIS;
-		Scene->hideSolids(ReflectionZ);
-		Scene->hideSolids(ReflectionO);
-		Scene->showSolids(ReflectionX);
-		grid.highlightGrid(1);
+		DrawingZone->getScene().hideSolids(ReflectionZ);
+		DrawingZone->getScene().hideSolids(ReflectionO);
+		DrawingZone->getScene().showSolids(ReflectionX);
+		DrawingZone->highlightGrid(1);
 		break;
 	case '2':
 		SymMode = SymmetryMode::ZAXIS;
-		Scene->hideSolids(ReflectionX);
-		Scene->hideSolids(ReflectionO);
-		Scene->showSolids(ReflectionZ);
-		grid.highlightGrid(2);
+		DrawingZone->getScene().hideSolids(ReflectionX);
+		DrawingZone->getScene().hideSolids(ReflectionO);
+		DrawingZone->getScene().showSolids(ReflectionZ);
+		DrawingZone->highlightGrid(2);
 		break;
 	case '3':
 		SymMode = SymmetryMode::O;
-		Scene->hideSolids(ReflectionX);
-		Scene->hideSolids(ReflectionZ);
-		Scene->showSolids(ReflectionO);
-		grid.highlightGrid(3);
+		DrawingZone->getScene().hideSolids(ReflectionX);
+		DrawingZone->getScene().hideSolids(ReflectionZ);
+		DrawingZone->getScene().showSolids(ReflectionO);
+		DrawingZone->highlightGrid(3);
 		break;
 
 	case '4':
 		SymMode = SymmetryMode::XZAXIS;
-		Scene->showSolids(ReflectionX);
-		Scene->showSolids(ReflectionZ);
-		Scene->showSolids(ReflectionO);
-		grid.highlightGrid(4);
+		DrawingZone->getScene().showSolids(ReflectionX);
+		DrawingZone->getScene().showSolids(ReflectionZ);
+		DrawingZone->getScene().showSolids(ReflectionO);
+		DrawingZone->highlightGrid(4);
 		break;
 	}
 }
@@ -642,7 +624,7 @@ int DragY = 0;
 glm::vec4 Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
 
 void changeSidebarMeshColor() {
-	std::vector<SceneNode*> nodes = sb.getScene()._nodes;
+	std::vector<SceneNode*> nodes = EditZone->getScene()._nodes;
 	std::vector<SceneNode*>::iterator it;
 	for (it = nodes.begin(); it != nodes.end(); it++) {
 		(*it)->setColor(Color);
@@ -812,7 +794,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 				if (SelectedNode != NULL) {
 					if (data != SelectedNode->_id) {
 						SelectedNode->_isSelected = false;
-						SceneNode* nextNode = Scene->findNode(GLint(data));
+						SceneNode* nextNode = DrawingZone->getScene().findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;
 							currentPosition.y -= 0.35f;
@@ -828,7 +810,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						}
 					}
 				} else {
-					SelectedNode = Scene->findNode(GLint(data));
+					SelectedNode = DrawingZone->getScene().findNode(GLint(data));
 					if (SelectedNode != NULL) {
 						glm::vec3 currentPosition = SelectedNode->_position;
 						currentPosition.y += 0.35f;
@@ -843,7 +825,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			}
 		}
 		if (state == GLUT_UP){
-			myCamera->update(0.0f, 0.0f);
+			DrawingZone->getCamera()->update(0.0f, 0.0f);
 			canDrag = false;
 		}
 		break;
@@ -855,7 +837,7 @@ void mouseMotion(int x, int y) {
 
 
 	if (canDrag){
-		myCamera->update((GLfloat)(x - lastMx), (GLfloat)(y - lastMy));
+		DrawingZone->getCamera()->update((GLfloat)(x - lastMx), (GLfloat)(y - lastMy));
 		lastMx = x;
 		lastMy = y; 
 	}
@@ -905,7 +887,7 @@ void wheel(int button, int dir, int x, int y) {
 			SelectedNode->setAngle(newAngle);
 		}
 	} else {
-		myCamera->zoom(dir);
+		DrawingZone->getCamera()->zoom(dir);
 	}
 
 }

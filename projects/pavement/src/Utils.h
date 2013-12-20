@@ -6,8 +6,11 @@
 #include <sstream>
 #include <fstream>
 
-class Utils{
+
+class Utils {
+
 public:
+
 	inline static std::string readFile(std::string filePath){
 		std::ifstream myFile;
 		std::string aux,myStringFile;

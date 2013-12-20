@@ -124,8 +124,8 @@ void Grid::addNode(SceneNode* n) {
 	_scene.addNode(n);
 }
 
-SceneGraph Grid::getScene() {
-	return _scene;
+SceneGraph* Grid::getScene() {
+	return &_scene;
 }
 
 Camera* Grid::getCamera() {

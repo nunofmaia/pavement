@@ -19,6 +19,7 @@
 #define MESH_PATH "../src/meshes/"
 #define TEXTURE_PATH "../src/meshes/basalt2.png"
 #define NOISE_TEXTURE_PATH "../src/meshes/PerlinNoise.jpg"
+#define SCENES_PATH "../src/scenes/"
 
 int WinX = 900, WinY = 640;
 int WindowHandle = 0;
@@ -239,9 +240,6 @@ void destroyShaderProgram() {
 
 /////////////////////////////////////////////////////////////////////// VAOs & VBOs
 
-SceneNode *white;
-SceneNode *black;
-
 void createSidebar() {
 	int id = 240;
 
@@ -286,24 +284,27 @@ void createSidebar() {
 	lprn->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cw = new Mesh("../src/meshes/sidebar/cube.obj");
-	white = new SceneNode(id++, 0, sq, Shader, TextureId);
-	white->createBufferObjects();
-	white->_position = glm::vec3(-0.15f, -0.6f, 0.0f);
-	white->_color = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
-	white->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+	SceneNode white(id++, 0, sq, Shader, TextureId);
+	white.createBufferObjects();
+	white._position = glm::vec3(-0.15f, -0.6f, 0.0f);
+	white._color = EditZone->_whiteColor;
+	white._scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Mesh *cb = new Mesh("../src/meshes/sidebar/cube.obj");
-	black = new SceneNode(id++, 0, sq, Shader, TextureId);
-	black->createBufferObjects();
-	black->_position = glm::vec3(0.15f, -0.6f, 0.0f);
-	black->_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-	black->_scale = glm::vec3(0.5f, 0.5f, 0.5f);
+	SceneNode black(id++, 0, sq, Shader, TextureId);
+	black.createBufferObjects();
+	black._position = glm::vec3(0.15f, -0.6f, 0.0f);
+	black._color = EditZone->_blackColor;
+	black._scale = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	EditZone->addNode(sqn);
 	EditZone->addNode(prn);
 	EditZone->addNode(hsn);
 	EditZone->addNode(qsn);
 	EditZone->addNode(lprn);
+
+	EditZone->_blackNode = black;
+	EditZone->_whiteNode = white;
 }
 
 void createTextures() {
@@ -367,11 +368,7 @@ void drawScene() {
 
 	glViewport(640, 0, 260, 640);
 	SimpleShader->useShaderProgram();
-	EditZone->draw();
-
-	white->draw();
-	black->draw();
-	
+	EditZone->draw();	
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glUseProgram(0); //TODO: Use ShaderProgram
@@ -387,7 +384,7 @@ void saveScene(std::string fileName) {
 	myfile.open (fileName);
 	std::vector<SceneNode*>::iterator it;
 
-	for (it = DrawingZone->getScene()._nodes.begin(); it != DrawingZone->getScene()._nodes.end(); ++it) {
+	for (it = DrawingZone->getScene()->_nodes.begin(); it != DrawingZone->getScene()->_nodes.end(); ++it) {
 		myfile << (*it)->_shape
 			<< " " << (*it)->_position.x
 			<< " " << (*it)->_position.y
@@ -404,6 +401,7 @@ void saveScene(std::string fileName) {
 
 void loadScene(std::string fileName) {
 	std::cout << "Loading scene..." << std::endl;
+	std::cout << fileName << std::endl;
 	std::ifstream myfile(fileName);
 	std::string line;
 	
@@ -411,7 +409,7 @@ void loadScene(std::string fileName) {
 		//TODO deveriamos fazer algum metodo que reiniciasse tudo?!
 		ID = 1;
 		SelectedNode = NULL;
-		DrawingZone->getScene().deleteAllNodes();
+		DrawingZone->getScene()->deleteAllNodes();
 		while (getline(myfile, line)) {
 			std::stringstream linestream(line);
 			int shape;
@@ -435,14 +433,14 @@ void loadScene(std::string fileName) {
 		myfile.close();
 		std::cout << "This scene has been loaded." << std::endl;
 	} else {
-		std::cout << "Unable to open file";
+		std::cout << "Unable to open file" << std::endl;
 	}
 }
 
 void deleteSelected() {
 	if (SelectedNode != NULL) {
 		AvailableIds.push(SelectedNode->_id);
-		DrawingZone->getScene().deleteNode(SelectedNode);
+		DrawingZone->getScene()->deleteNode(SelectedNode);
 		SelectedNode = NULL;
 	}
 }
@@ -484,31 +482,14 @@ void keyboard(unsigned char key, int x, int y) {
 
 	std::vector<Mesh*>::iterator it;
 	std::string fileName;
+	std::string path;
 
 	switch (key) {
 	case 'q':
 		glutDestroyWindow(WindowHandle);
 		break;
-	case 'c':
-		addNode(0);
-		break;
-	case 'v':
-		addNode(1);
-		break;
-	case 'b':
-		addNode(2);
-		break;
-	case 'n':
-		addNode(3);
-		break;
-	case 'm':
-		addNode(4);
-		break;
-	case 'k':
-		addNode(5);
-		break;
 	case 'd':
-		DrawingZone->getScene().deleteAllNodes();
+		DrawingZone->getScene()->deleteAllNodes();
 		ID = 1;
 		break;
 	//backspace key has an ascii number
@@ -518,63 +499,51 @@ void keyboard(unsigned char key, int x, int y) {
 	case 's':
 		std::cout << "Save scene - Please enter the file name: ";
 		std::cin >> fileName;
-		saveScene(fileName);
+		path = SCENES_PATH + fileName;
+		saveScene(path);
+		//Utils::saveScene(path, DrawingZone->getScene());
 		break;
 	case 'l':
 		std::cout << "Load scene - Please enter the file name: ";
 		std::cin >> fileName;
-		loadScene(fileName);
-		break;
-	case 'p':
-		if(SelectedNode != NULL){
-			SelectedNode->setColor(glm::vec4(0.164, 0.168, 0.22, 1.0));
-		}
-		break;
-	case 'o':
-		if(SelectedNode != NULL){
-			SelectedNode->setColor(glm::vec4(1.0, 0.98, 0.92, 1.0));
-		}
-		break;
-	case 'r':
-		if(SelectedNode != NULL){
-			GLfloat newAngle = SelectedNode->_angle + 90.0f;
-			SelectedNode->setAngle(newAngle);
-		}
+		path = SCENES_PATH + fileName;
+		loadScene(path);
+		//Utils::loadScene(path, DrawingZone->getScene());
 		break;
 	case '0':
 		SymMode = SymmetryMode::NONE;
-		DrawingZone->getScene().hideSolids(ReflectionX);
-		DrawingZone->getScene().hideSolids(ReflectionZ);
-		DrawingZone->getScene().hideSolids(ReflectionO);
+		DrawingZone->getScene()->hideSolids(ReflectionX);
+		DrawingZone->getScene()->hideSolids(ReflectionZ);
+		DrawingZone->getScene()->hideSolids(ReflectionO);
 		DrawingZone->highlightGrid(0);
 		break;
 	case '1':
 		SymMode = SymmetryMode::XAXIS;
-		DrawingZone->getScene().hideSolids(ReflectionZ);
-		DrawingZone->getScene().hideSolids(ReflectionO);
-		DrawingZone->getScene().showSolids(ReflectionX);
+		DrawingZone->getScene()->hideSolids(ReflectionZ);
+		DrawingZone->getScene()->hideSolids(ReflectionO);
+		DrawingZone->getScene()->showSolids(ReflectionX);
 		DrawingZone->highlightGrid(1);
 		break;
 	case '2':
 		SymMode = SymmetryMode::ZAXIS;
-		DrawingZone->getScene().hideSolids(ReflectionX);
-		DrawingZone->getScene().hideSolids(ReflectionO);
-		DrawingZone->getScene().showSolids(ReflectionZ);
+		DrawingZone->getScene()->hideSolids(ReflectionX);
+		DrawingZone->getScene()->hideSolids(ReflectionO);
+		DrawingZone->getScene()->showSolids(ReflectionZ);
 		DrawingZone->highlightGrid(2);
 		break;
 	case '3':
 		SymMode = SymmetryMode::O;
-		DrawingZone->getScene().hideSolids(ReflectionX);
-		DrawingZone->getScene().hideSolids(ReflectionZ);
-		DrawingZone->getScene().showSolids(ReflectionO);
+		DrawingZone->getScene()->hideSolids(ReflectionX);
+		DrawingZone->getScene()->hideSolids(ReflectionZ);
+		DrawingZone->getScene()->showSolids(ReflectionO);
 		DrawingZone->highlightGrid(3);
 		break;
 
 	case '4':
 		SymMode = SymmetryMode::XZAXIS;
-		DrawingZone->getScene().showSolids(ReflectionX);
-		DrawingZone->getScene().showSolids(ReflectionZ);
-		DrawingZone->getScene().showSolids(ReflectionO);
+		DrawingZone->getScene()->showSolids(ReflectionX);
+		DrawingZone->getScene()->showSolids(ReflectionZ);
+		DrawingZone->getScene()->showSolids(ReflectionO);
 		DrawingZone->highlightGrid(4);
 		break;
 	}
@@ -621,141 +590,116 @@ int MouseY = 0;
 int DragX = 0;
 int DragY = 0;
 
-glm::vec4 Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
-
-void changeSidebarMeshColor() {
-	std::vector<SceneNode*> nodes = EditZone->getScene()._nodes;
-	std::vector<SceneNode*>::iterator it;
-	for (it = nodes.begin(); it != nodes.end(); it++) {
-		(*it)->setColor(Color);
-	}
-}
-
 
 void nodeSelector(GLfloat data) {
 	GLuint id = GLuint(data);
+	glm::vec4 currentColor = EditZone->_currentColor;
 
 	switch (id) {
 	case 240:
-		std::cout << "Cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			//canDrag = true;
 		}
 		SelectedNode = addNode(0);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
-			SelectedNode->setColor(Color);
+			SelectedNode->setColor(currentColor);
 			SelectedNode->_isSelected = true;
 
 			canDrag = false;
 		}
 		break;
 	case 241:
-		std::cout << "Prism" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			//canDrag = true;
 		}
 		SelectedNode = addNode(2);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
-			SelectedNode->setColor(Color);
+			SelectedNode->setColor(currentColor);
 			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
 	case 242:
-		std::cout << "Half cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			//canDrag = true;
 		}
 		SelectedNode = addNode(1);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
-			SelectedNode->setColor(Color);
+			SelectedNode->setColor(currentColor);
 			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
 	case 243:
-		std::cout << "Quarter cube" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			//canDrag = true;
 		}
 		SelectedNode = addNode(4);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
-			SelectedNode->setColor(Color);
+			SelectedNode->setColor(currentColor);
 			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
 	case 244:
-		std::cout << "Half prism" << std::endl;
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y -= 0.35f;
 			SelectedNode->setPosition(currentPosition);
 
 			SelectedNode = NULL;
-			//canDrag = true;
 		}
 		SelectedNode = addNode(3);
 		if (SelectedNode != NULL) {
 			glm::vec3 currentPosition = SelectedNode->_position;
 			currentPosition.y += 0.35f;
 			SelectedNode->setPosition(currentPosition);
-			SelectedNode->setColor(Color);
+			SelectedNode->setColor(currentColor);
 			SelectedNode->_isSelected = true;
 			canDrag = false;
 		}
 		break;
 	case 245:
-		std::cout << "White" << std::endl;
-
 		if (SelectedNode != NULL) {
-			SelectedNode->setColor(glm::vec4(0.9, 0.9, 0.9, 1.0));
+			SelectedNode->setColor(EditZone->_whiteColor);
 		} else {
-			Color = glm::vec4(0.9, 0.9, 0.9, 1.0);
-			changeSidebarMeshColor();
+			EditZone->swapColors(EditZone->_whiteColor);
 		}
 
 		break;
 	case 246:
-		std::cout << "Black" << std::endl;
-
 		if (SelectedNode != NULL) {
-			SelectedNode->setColor(glm::vec4(0.3, 0.3, 0.4, 1.0));
+			SelectedNode->setColor(EditZone->_blackColor);
 		} else {
-			Color = glm::vec4(0.1, 0.1, 0.1, 1.0);
-			changeSidebarMeshColor();
+			EditZone->swapColors(EditZone->_blackColor);
 		}
 		break;
 	}
@@ -779,7 +723,6 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			GLfloat data;
 			glReadPixels(MouseX, WinY - MouseY - 1, 1, 1, GL_STENCIL_INDEX, GL_FLOAT, &data);
 
-			std::cout << "Stencil data: " << data << std::endl;
 			if (data == 0) {
 				if (SelectedNode != NULL) {
 					glm::vec3 currentPosition = SelectedNode->_position;
@@ -793,12 +736,12 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 			} else {
 				if (SelectedNode != NULL) {
 					if (data != SelectedNode->_id) {
-						SelectedNode->_isSelected = false;
-						SceneNode* nextNode = DrawingZone->getScene().findNode(GLint(data));
+						SceneNode* nextNode = DrawingZone->getScene()->findNode(GLint(data));
 						if (nextNode != NULL) {
 							glm::vec3 currentPosition = SelectedNode->_position;
 							currentPosition.y -= 0.35f;
 							SelectedNode->setPosition(currentPosition);
+							SelectedNode->_isSelected = false;
 							
 							SelectedNode = nextNode;
 							 currentPosition = SelectedNode->_position;
@@ -810,7 +753,7 @@ void mouse(GLint button, GLint state, GLint x, GLint y) {
 						}
 					}
 				} else {
-					SelectedNode = DrawingZone->getScene().findNode(GLint(data));
+					SelectedNode = DrawingZone->getScene()->findNode(GLint(data));
 					if (SelectedNode != NULL) {
 						glm::vec3 currentPosition = SelectedNode->_position;
 						currentPosition.y += 0.35f;

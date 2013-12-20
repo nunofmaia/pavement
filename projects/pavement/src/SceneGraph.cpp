@@ -3,6 +3,10 @@
 SceneNode::SceneNode() {
 	_mesh = NULL;
 	_shader = NULL;
+	_canDraw = false;
+	_textureLoaded = false;
+	_toRevert = false;
+	_isSelected = false;
 }
 
 SceneNode::SceneNode(int id, int shape, Mesh* mesh, ShaderProgram* shader) {

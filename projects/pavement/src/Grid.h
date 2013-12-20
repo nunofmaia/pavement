@@ -19,7 +19,7 @@ public:
 	void highlightGrid(int);
 	
 	void addNode(SceneNode*);
-	SceneGraph getScene();
+	SceneGraph* getScene();
 	Camera* getCamera();
 
 private:

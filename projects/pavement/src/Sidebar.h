@@ -20,13 +20,21 @@ class Sidebar {
 
 public:
 
+	glm::vec4 _blackColor;
+	glm::vec4 _whiteColor;
+	glm::vec4 _currentColor;
+
+	SceneNode _whiteNode;
+	SceneNode _blackNode;
+
 	Sidebar();
 	~Sidebar();
 
 	void createBufferObjects();
 	void draw();
 	void addNode(SceneNode*);
-	SceneGraph getScene();
+	SceneGraph* getScene();
+	void swapColors(glm::vec4);
 };
 
 

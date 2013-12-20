@@ -68,9 +68,8 @@ void main(void) {
 	//vec3 normal = normalize(n);
 	vec3 normal = n;
 	vec3 eye = vec3(0.0, 5.0, 5.0);
-	vec3 lightSource = vec3(0.0, 5.0, 3.0);
-	//vec4 diffuseLight = vec4(0.9, 0.9, 0.9, 1.0);
-	vec4 diffuseLight = ex_Color;
+	vec3 lightSource = vec3(0.0, 5.0, 5.0);
+	vec4 diffuseLight = vec4(0.9, 0.9, 0.9, 1.0);
 
 	vec4 ambientLight = vec4(0.1,0.1,0.1,1.0);
 	vec4 specularLight = vec4(0.5,0.5,0.5,1.0);
@@ -80,22 +79,16 @@ void main(void) {
 	vec3 E = normalize(eye - v);
 	vec3 R = normalize(reflect(-L, normal));
 
-	//vec4 Idiff = ex_Color * max(dot(normal, L), 0.0) * diffuseLight;
-	vec4 Idiff = max(dot(normal, L), 0.0) * diffuseLight;
+	vec4 Idiff = ex_Color * max(dot(normal, L), 0.0) * diffuseLight;
 	Idiff = clamp(Idiff, 0.0, 1.0);
 
 	vec4 Iamb = ambientLight;
 
 	vec4 Ispec = pow(max(dot(R, E), 0.0), shininess) * specularLight;
 	Ispec = clamp(Ispec, 0.0, 1.0);
-
 	
-	//out_Color = vec4(f0(texture2D(texture_uniform, ex_TexCoord).xy * 5.0)) * (Idiff + Iamb + Ispec);
-	
-  float noise_val = (texture2D(noise_texture_uniform,ex_TexCoord).r * 0.5 + 0.7);
+	float noise_val = (texture2D(noise_texture_uniform,ex_TexCoord).r * 0.5 + 0.7);
 
-  //float noise_val = noise(ex_TexCoord);
-
-  out_Color = (texture2D(texture_uniform,ex_TexCoord) * noise_val) * Idiff + Ispec;
+	out_Color = (texture2D(texture_uniform,ex_TexCoord) * noise_val) * Idiff + Ispec;
 
 }
